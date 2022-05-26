@@ -1,0 +1,63 @@
+<!-- 导入静态文件相关模块以及相关设置 -->
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width,initial-scale=1.0" />
+		<title>用户登录</title>
+		<link rel="stylesheet"  href="{% static "login.css" %}" />
+        <script src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+	</head>
+
+	<body>
+        <div class="login">
+            {% csrf_token %}
+            <h2>用户登录</h2>
+            <div class="login_box">
+				<!-- required就是不能为空  必须在css效果中有很大的作用 -->
+				<input type="text" name='username' id='username' required  />
+				<label for="name" >用户名</label>
+            </div>
+            <div class="login_box">
+				<input type="password" name='password' id='password' required="required">
+				<label for="pwd">密码</label>
+            </div>
+            <a id="denglu">登录<span></span><span></span><span></span><span></span></a>
+		 </div>
+	</body>
+    <script>
+        $("#denglu").click(function(){
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+            const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            console.log(username,password,csrftoken);
+            const body = "username=" + username + "&password=" + password
+            fetch('/login/', {
+                method: 'POST',
+                headers: {'X-CSRFToken': csrftoken, 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
+                mode: 'same-origin', // Do not send CSRF token to another domain.
+                body: body,
+            })
+            .then(response => {
+                if (response.status === 200) {
+                    return response.json();
+                } else {
+                    throw new Error('Something went wrong on api server!');
+                }
+            })
+            .then(data => {
+                console.log('Success:', data);
+                if (data.code === 200) {
+                    alert(data.message)
+                    window.location.href='/test/';
+                } else {
+                    alert(data.message)
+                }
+            })
+            .catch((error) => {
+              console.error('Error:', error);
+            });
+        });
+    </script>
+</html>

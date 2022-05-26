@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>员工信息管理</title>
+</head>
+<body>
+<div align="center">
+    <h1>修改员工信息</h1>
+    <hr>
+    <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="id" id="id" value="{{ employeeinfo.id }}">
+        <div>
+            <label>电话号码：</label>
+            <input type="text" name="phone" id="phone" value="{{ employeeinfo.phone }}">
+        </div>
+        <br>
+        <div>
+            <label>居住地址：</label>
+            <input type="text" name="address" id="address" value="{{ employeeinfo.address }}">
+        </div>
+        <div>
+            <input type="submit" value="保存">
+        </div>
+    </form>
+    <div style="color: red">{{ error_info }}</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>员工信息管理</title>
+</head>
+<body>
+<div align="center">
+    <h1>员工信息列表</h1>
+    <hr>
+    <div><a href="/company/add_employeeinfo/">增加一条记录</a> </div>
+    <table border="1">
+        <thead>
+        <tr>
+            <td>电话号码</td>
+            <td>居住地址</td>
+            <td colspan="2">操作</td>
+        </tr>
+        </thead>
+        <tbody>
+        {% for employeeinfo in employeeinfo_list %}
+        <tr>
+            <td>{{ employeeinfo.phone }}</td>
+            <td>{{ employeeinfo.address }}</td>
+            <td><a href="/company/del_employeeinfo/{{ employeeinfo.id }}" >删除</a></td>
+            <td><a href="/company/edit_employeeinfo/{{ employeeinfo.id }}" >修改</a></td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="4">无相关记录！</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

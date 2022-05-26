@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>员工管理</title>
+</head>
+<body>
+<div align="center">
+    <h1>增加员工</h1>
+    <hr>
+    <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="id" id="id" value="{{ dep.id }}">
+        <div>
+            <label>姓名：</label>
+            <input type="text" name="name" id="name">
+        </div>
+        <div>
+            <label>邮箱：</label>
+            <input type="text" name="email" id="email">
+        </div>
+        <div>
+            <label>薪水：</label>
+            <input type="text" name="salary" id="salary">
+        </div>
+        <br>
+        <div>
+            <label>员工信息：</label>
+            <select name="employeeinfo" id="employeeinfo">
+                {% for employeeinfo in employeeinfo_list %}
+                    <option value="{{ employeeinfo.id }}">{{ employeeinfo.phone }}{{ employeeinfo.address }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <br>
+        <div>
+            <label>部门：</label>
+            <select name="dep" id="dep">
+                {% for dep in dep_list %}
+                    <option value="{{ dep.id }}">{{ dep.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <br>
+        <div>
+            <label>团体：</label>
+            <select name="group" id="group" multiple="true">
+                {% for group in group_list %}
+                    <option value="{{ group.id }}">{{ group.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <br>
+        <div>
+            <input type="submit" value="保存">
+        </div>
+    </form>
+    <div style="color: red">{{ error_info }}</div>
+</div>
+</body>
+</html>
