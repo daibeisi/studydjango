@@ -26,7 +26,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 # 1.视图函数变动，自动重启服务器
 # 2.错误详细输出，环境变量
 # 3.生产环境中需要关闭
-DEBUG = False
+DEBUG = True
 
 # 允许访问的域名或者IP地址
 ALLOWED_HOSTS = ["*"]
@@ -89,24 +89,24 @@ DATABASES = {
     # }
 
     #  PROD
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('POSTGRES_NAME'),
-        'USER': os.environ.get('POSTGRES_USER'),
-        'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
-        'HOST': 'db',
-        'PORT': 5432,
-    }
-
-    #  DEV
     # 'default': {
     #     'ENGINE': 'django.db.backends.postgresql',
-    #     'NAME': 'django',
-    #     'USER': 'daibeisi',
-    #     'PASSWORD': 'e0@M3bP.90jwoSF!a9',
-    #     'HOST': '127.0.0.1',
+    #     'NAME': os.environ.get('POSTGRES_NAME'),
+    #     'USER': os.environ.get('POSTGRES_USER'),
+    #     'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
+    #     'HOST': 'db',
     #     'PORT': 5432,
     # }
+
+    #  DEV
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'django',
+        'USER': 'daibeisi',
+        'PASSWORD': 'e0@M3bP.90jwoSF!a9',
+        'HOST': '127.0.0.1',
+        'PORT': 5432,
+    }
 }
 
 # Password validation
@@ -145,8 +145,8 @@ USE_TZ = False
 
 # 静态文件的路由（url）地址
 STATIC_URL = '/static/'
-# STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
-STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
+STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
+# STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 # 上传的文件路径
 MEDIA_ROOT = os.path.join(BASE_DIR, 'upload/')
 # Default primary key field type
