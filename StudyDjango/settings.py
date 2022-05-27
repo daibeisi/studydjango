@@ -19,8 +19,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent  # 获取项目的根路径
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-# 生成用户名的时候，加密字符串
-SECRET_KEY = 'django-insecure-zc1=+32*#i%*_o=ryj20^v1$2sv^#1-dwz)7upuk0qkz-117wn'
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # 开启调试模式:
