@@ -3,7 +3,8 @@ from django.shortcuts import render, HttpResponse
 
 # Create your views here.
 def index(request):
-    return HttpResponse("<h1>Hell World!</h1>")
+    # TODO:解决测试环境访问图片地址报404
+    return render(request, "base/index.html")
 
 
 def test(request):
