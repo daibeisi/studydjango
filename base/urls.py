@@ -6,8 +6,9 @@ from . import views
 
 # 二级URL设置
 urlpatterns = [
+    path('favicon.ico', RedirectView.as_view(url=static('favicon.ico'))),
     path('', views.index),
     path("test/", views.test),
     path("time/", views.time),
-    path('favicon.ico', RedirectView.as_view(url=static('favicon.ico'))),
+    path("filter/", views.test_filter),
 ]

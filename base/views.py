@@ -4,7 +4,6 @@ import datetime
 
 # Create your views here.
 def index(request):
-    # TODO:解决测试环境访问图片地址报404
     return render(request, "base/index.html")
 
 
@@ -19,3 +18,5 @@ def time(request):
                                                                            hour=now.hour, minute=now.minute,
                                                                            second=now.second,
                                                                            microsecond=now.microsecond))
+def test_filter(request):
+    return render(request, "base/test_filter.html", {'hair': "morehair"})
