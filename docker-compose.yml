@@ -30,6 +30,6 @@ services:
       - POSTGRES_NAME=postgres
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
-      - SECRET_KEY=django-insecure-zc1=+32*#i%*_o=ryj20^v1$2sv^#1-dwz)7upuk0qkz-117wn
+      - SECRET_KEY=django-insecure-zc1=+32*#i%*_o=ryj20^v1$$2sv^#1-dwz)7upuk0qkz-117wn
     depends_on:
       - db
