@@ -4,7 +4,7 @@ ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 WORKDIR /Django
 COPY . /Django/
-RUN rm /etc/apt/sources.list
+RUN mv /etc/apt/sources.list /etc/apt/sources.list.bak
 RUN ln -s /Django/sources.list /etc/apt/
 RUN apt-get update -y
 RUN apt-get install nginx -y
