@@ -11,4 +11,5 @@ urlpatterns = [
     path("test/", views.test),
     path("time/", views.time),
     path("filter/", views.test_filter),
+    path("tag/", views.test_simpletag),
 ]

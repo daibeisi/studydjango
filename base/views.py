@@ -23,3 +23,7 @@ def time(request):
 
 def test_filter(request):
     return render(request, "base/test_filter.html", {'hair': "morehair"})
+
+
+def test_simpletag(request):
+    return render(request, "base/test_tag.html")
