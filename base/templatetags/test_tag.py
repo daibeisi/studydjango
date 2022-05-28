@@ -13,3 +13,7 @@ def test_simpletag(*args):
     agr_str = "".join(args)
     return "这是一个simpletag示例，它接收的参数是:{}".format(agr_str)
 
+
+@register.inclusion_tag("base/inclusion_tag.html")
+def test_inclusiontag(*args):
+    return {"args": args}

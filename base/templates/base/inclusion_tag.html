@@ -1,0 +1,8 @@
+<h1>args</h1>
+<ul>
+    {% for a in args %}
+        <li>{{ a }}</li>
+    {% empty %}
+        <li>--</li>
+    {% endfor %}
+</ul>
