@@ -1,0 +1,25 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>母版</title>
+    <link href="{% static 'bootstrap/css/bootstrap.min.css' %}" rel='stylesheet' type='text/css'/>
+    <script type="text/javascript" src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
+</head>
+<body>
+<div class="container">
+    <div class="page-header">
+        <h1>这是母版标题<small>--母版样例</small></h1>
+    </div>
+    {% block main %}
+    {% endblock %}
+    <div>
+        <h3>这是母版底部<small>--母版样例</small></h3>
+    </div>
+</div>
+</body>
+</html>

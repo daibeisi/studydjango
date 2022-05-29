@@ -12,4 +12,6 @@ urlpatterns = [
     path("time/", views.time),
     path("filter/", views.test_filter),
     path("tag/", views.test_simpletag),
+    path("base/", views.base),
+    path("inhert_base/", views.inhert_base),
 ]

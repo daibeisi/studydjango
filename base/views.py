@@ -27,3 +27,11 @@ def test_filter(request):
 
 def test_simpletag(request):
     return render(request, "base/test_tag.html")
+
+
+def base(request):
+    return render(request, "base/base.html")
+
+
+def inhert_base(request):
+    return render(request, "base/inhert_base.html")
