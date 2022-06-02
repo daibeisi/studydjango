@@ -14,4 +14,5 @@ urlpatterns = [
     path("tag/", views.test_simpletag),
     path("base/", views.base),
     path("inhert_base/", views.inhert_base),
+    path("include/", views.test_include),
 ]

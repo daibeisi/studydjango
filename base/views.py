@@ -35,3 +35,7 @@ def base(request):
 
 def inhert_base(request):
     return render(request, "base/inhert_base.html")
+
+
+def test_include(request):
+    return render(request, "base/test_include.html")
