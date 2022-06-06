@@ -26,7 +26,6 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - TZ=Asia/Shanghai # 设置容器时区与宿主机保持一致
       - POSTGRES_NAME=postgres
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
