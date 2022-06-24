@@ -1,6 +1,7 @@
 import logging
-from django.shortcuts import render, redirect
-from company.models import *
+from django.shortcuts import render, redirect, HttpResponse
+from .models import *
+from . import forms
 
 # Get an instance of a logger
 logging.basicConfig(format='%(asctime)s-%(levelname)s-%(pathname)s[%(lineno)d]: %(message)s', level=logging.INFO)
@@ -8,6 +9,10 @@ logger = logging.getLogger(__name__)
 
 
 # Create your views here.
+def index(request):
+    return render(request, "company/base.html")
+
+
 def list_dep(request):
     dep_list = Department.objects.all()
     return render(request, 'company/dep_list.html', {'dep_list': dep_list})
@@ -99,7 +104,7 @@ def edit_group(request, group_id):
 
 def list_employee(request):
     employee_list = Employee.objects.all()
-    return render(request, 'company/employee_list.html', {'employee_list': employee_list})
+    return render(request, 'company/list_employee.html', {'employee_list': employee_list})
 
 
 def del_employee(request, employee_id):
@@ -202,3 +207,24 @@ def edit_employeeinfo(request, employeeinfo_id):
         return redirect("/company/list_employeeinfo/")
     else:
         return render(request, "company/employeeinfo_edit.html", {"employeeinfo": employeeinfo})
+
+
+def test_forms(request):
+    if request.method=="POST":
+        # 通过request.POST为test_form对象赋值
+        test_form = forms.TestForm(request.POST)
+        # 表单校验功能
+        if test_form.is_valid():
+            # 校验通过的数据存放在cleaned_data中，cleaned_data是字典类型，因此要用get()函数取值
+            name = test_form.cleaned_data.get("name")
+            email = test_form.cleaned_data.get("email")
+            if name or email:
+                return HttpResponse("输入数据合法")
+            else:
+                return HttpResponse("请补全数据！")
+        else:
+            return HttpResponse("输入数据不合法！")
+    test_form = forms.TestForm()
+    return render(request, "company/test_form.html", {"test_form": test_form})
+
+
