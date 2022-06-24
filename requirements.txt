@@ -2,3 +2,6 @@ Django==3.2
 psycopg2
 # PyMySQL
 uwsgi
+requests
+Pillow
+django-ckeditor
