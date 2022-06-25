@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 # Create your models here.
 class UserInfo(models.Model):
     # 字段
-    user = models.OneToOneField(to='auth.user', on_delete=models.CASCADE, null=True, verbose_name='用户')
+    user = models.OneToOneField(to='User', on_delete=models.CASCADE, null=True, verbose_name='用户')
     birthdate = models.DateField(blank=True, null=True, verbose_name='出生日期')
     phone = models.CharField(max_length=20, blank=True, default='', verbose_name='电话号码')
     address = models.CharField(max_length=50, blank=True, default='', verbose_name='地址')
