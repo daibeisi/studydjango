@@ -2,3 +2,5 @@
 */migrations/*
 !*/migrations/__init__.py
 upload
+log
+data

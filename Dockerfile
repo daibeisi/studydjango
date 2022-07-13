@@ -7,7 +7,6 @@ FROM python:3
 # 相当于设置 python 命令行的 -u 选项
 # 不缓冲stdin、stdout和stderr，默认是缓冲的。
 ENV PYTHONUNBUFFERED=1
-ENV TZ Asia/Shanghai
 
 WORKDIR /Django
 COPY . /Django/
@@ -18,10 +17,10 @@ RUN mv /etc/apt/sources.list /etc/apt/sources.list.bak \
     && apt-get -y update \
     && apt-get -y install nginx \
     && python -m pip install --upgrade pip -i https://mirrors.aliyun.com/pypi/simple/ \
-    && pip install -r requirements.txt -i https://mirrors.aliyun.com/pypi/simple/ \
-    && ln -s /Django/StudyDjango_nginx.conf /etc/nginx/sites-enabled
+    && pip install --no-cache-dir -r requirements.txt -i https://mirrors.aliyun.com/pypi/simple/ \
+    && ln -s /Django/DjangoServer.conf /etc/nginx/sites-enabled
 # 声明端口
-EXPOSE 8000
+#EXPOSE 8000
 # 设置默认执行的命令，docker run 时运行
 # CMD XXX
-LABEL org.opencontainers.image.authors="daibeisi"
+#LABEL org.opencontainers.image.authors="daibeisi"

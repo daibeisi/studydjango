@@ -3,5 +3,8 @@ psycopg2
 # PyMySQL
 uwsgi
 requests
-Pillow
+pillow
 django-ckeditor
+whoosh
+django_haystack
+jieba
