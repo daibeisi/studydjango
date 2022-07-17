@@ -33,5 +33,5 @@ urlpatterns = [
     path('', include('Apps.base.urls', namespace="base")),
     path('company/', include('Apps.company.urls', namespace="company")),
     path('blog/', include('Apps.blog.urls', namespace="blog")),
-]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) \
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) \
               + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -28,7 +28,7 @@ services:
     volumes:
       - .:/Django
       - ./log/nginx/:/var/log/nginx
-    command:  # TODO:弃用安装时的nginx.conf，改用自己的nginx.conf
+    command:
       - sh
       - -c
       - |

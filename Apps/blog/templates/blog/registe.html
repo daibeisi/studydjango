@@ -1,9 +1,9 @@
-{% load staticfiles %}
+{% load static %}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>注册页面</title>
-    <link href="{% static 'blog/css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
 </head>
 <body>
 
@@ -85,8 +85,8 @@
         </div>
     </div>
 </div>
-<script src="{% static 'blog/js/jquery-2.1.3.min.js' %}"></script>
-<script src="{% static 'blog/js/bootstrap.min.js' %}"></script>
+<script src="{% static 'jquery/jquery-3.6.0.min..js' %}"></script>
+<script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
 <script>
     // 找到头像的input标签绑定change事件
     $("#id_head_img").k(function () {

@@ -1,4 +1,5 @@
 from django.test import TestCase
+# 测试工具的默认在以 test 开头的文件中找到所有的 unittest.TestCase 的子类，从这些测试用例中自动构建一个测试套件，然后运行该套件
 from .models import *
 # Create your tests here.
 

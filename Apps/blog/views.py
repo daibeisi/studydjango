@@ -3,14 +3,11 @@ from . import models
 # from comments.forms import CommentForm
 from django.views.generic import ListView,DetailView
 from django.contrib.auth.models import auth
-
 from django.db.models import Q
-
-# Create your views here.
-#-------------------测试前台使用django ckeditor-----------
 from .models import Category
+# Create your views here.
 
-
+#-------------------测试前台使用django ckeditor-----------
 def test_ckeditor_front(request):
     user_obj = models.BlogUser.objects.all().first()
     auth.login(request, user_obj)
@@ -154,7 +151,8 @@ def login(request):
 from . import forms
 def registe(request):
     if request.method == "POST":
-        #form_obj = forms.reg_form(request.POST)#有图片上传,这个句代码是错误的!!!!!!!!!!!
+        # form_obj = forms.reg_form(request.POST)  有图片上传,这个句代码是错误的!!!!!!!!!!!
+        # 初始化reg_form的一般字段都包含在request.POST中，文件、图片字段中包含上传功能的字段不在request.POST中，而是保存在request.FILES中
         form_obj = forms.reg_form(request.POST, request.FILES)
         if form_obj.is_valid(): # 判断校验是否通过
             form_obj.cleaned_data.pop("repassword")
@@ -165,9 +163,9 @@ def registe(request):
             return redirect('/')
         else:
             #print(form_obj['repassword'].errors)
-            return render(request, "blog/templates/blog/registe.html", {"formobj": form_obj})
+            return render(request, "blog/registe.html", {"formobj": form_obj})
     form_obj = forms.reg_form()# 生成一个form对象
-    return render(request, "blog/templates/blog/registe.html", {"formobj": form_obj})
+    return render(request, "blog/registe.html", {"formobj": form_obj})
 
 
 
