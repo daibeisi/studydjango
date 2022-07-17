@@ -16,14 +16,17 @@ BASE_DIR = Path(__file__).resolve().parent.parent  # 获取项目的根路径
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
+"""关键配置"""
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get('SECRET_KEY', "******")
 CURRENT_ENV = os.environ.get('CURRENT_ENV', "dev")
+# DEBUG = False
+# ALLOWED_HOSTS = ["*"]
 
 if CURRENT_ENV == 'prod':
     # SECURITY WARNING: don't run with debug turned on in production!
     DEBUG = False
-    # 真正上线部署的时候不建议填成通配符的*，而是要填允许访问的主机域名
+    # 该配置避免你的站点遭受某些 CSRF 攻击。如果使用了通配符，你必须实现自定义的 Host HTTP 头，或者确保你不会很容易地遭受此种攻击。
     ALLOWED_HOSTS = ["*"]
     # 默认电子邮件地址，用于网站管理员的各种自动通信。这不包括发送到ADMINS和MANAGERS的错误信息
     DEFAULT_FROM_EMAIL = 'webmaster@example.com'
