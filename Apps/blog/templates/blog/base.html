@@ -1,9 +1,9 @@
-{% load staticfiles %}
+{% load static %}
 {% load custom_tags %}
 
 <html>
 <head>
-    <title>blog样例 </title>
+    <title>Django博客系统</title>
     <!-- meta -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -32,7 +32,7 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="{% url 'blog:index' %}" style="color:red;font-weight:700;">&nbsp;&nbsp;&nbsp;&nbsp;Blog系统简例&nbsp;&nbsp;&nbsp;&nbsp; </a>
+            <a class="navbar-brand" href="{% url 'blog:index' %}" style="color:red;font-weight:700;">&nbsp;&nbsp;&nbsp;&nbsp;Django博客系统&nbsp;&nbsp;&nbsp;&nbsp; </a>
         </div>
         <!-- Collect the nav links, forms, and other content for toggling -->
         <div class="collapse navbar-collapse navbar-left" id="bs-example-navbar-collapse-1">
