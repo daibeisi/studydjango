@@ -29,8 +29,10 @@ admin.site.site_title = '呆贝斯管理系统'
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('ckeditor/', include('ckeditor_uploader.urls')),
+    path('search/',include('haystack.urls')),
     path('favicon.ico', RedirectView.as_view(url='/static/favicon.ico')),
     path('', include('Apps.base.urls', namespace="base")),
+    path('comments/', include('Apps.comments.urls')),
     path('company/', include('Apps.company.urls', namespace="company")),
     path('blog/', include('Apps.blog.urls', namespace="blog")),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) \

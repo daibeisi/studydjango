@@ -17,50 +17,38 @@ BASE_DIR = Path(__file__).resolve().parent.parent  # 获取项目的根路径
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 """关键配置"""
+CURRENT_ENV = os.environ.get('CURRENT_ENV', "dev")
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get('SECRET_KEY', "******")
-CURRENT_ENV = os.environ.get('CURRENT_ENV', "dev")
-# DEBUG = False
-# ALLOWED_HOSTS = ["*"]
-
-if CURRENT_ENV == 'prod':
-    # SECURITY WARNING: don't run with debug turned on in production!
-    DEBUG = False
-    # 该配置避免你的站点遭受某些 CSRF 攻击。如果使用了通配符，你必须实现自定义的 Host HTTP 头，或者确保你不会很容易地遭受此种攻击。
-    ALLOWED_HOSTS = ["*"]
-    # 默认电子邮件地址，用于网站管理员的各种自动通信。这不包括发送到ADMINS和MANAGERS的错误信息
-    DEFAULT_FROM_EMAIL = 'webmaster@example.com'
-    # Database
-    # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
-    DATABASES = {
-        #  PROD
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': os.environ.get('POSTGRES_NAME'),
-            'USER': os.environ.get('POSTGRES_USER'),
-            'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
-            'HOST': 'db',
-            'PORT': 5432,
-        }
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = False if CURRENT_ENV == 'prod' else True
+# 该配置避免你的站点遭受某些 CSRF 攻击。如果使用了通配符，你必须实现自定义的 Host HTTP 头，或者确保你不会很容易地遭受此种攻击。
+ALLOWED_HOSTS = ["*"] if CURRENT_ENV == 'prod' else ["*"]
+# 默认电子邮件地址，用于网站管理员的各种自动通信。这不包括发送到ADMINS和MANAGERS的错误信息
+DEFAULT_FROM_EMAIL = 'webmaster@example.com'
+# Database
+# https://docs.djangoproject.com/en/3.2/ref/settings/#databases
+DATABASES = {
+    #  PROD
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ.get('POSTGRES_NAME'),
+        'USER': os.environ.get('POSTGRES_USER'),
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
+        'HOST': 'db',
+        'PORT': 5432,
     }
-else:
-    # 开启调试模式: 1.视图函数变动，自动重启服务器 2.错误详细输出，环境变量 3.生产环境中需要关闭
-    DEBUG = True
-    # 允许访问的域名或者IP地址
-    ALLOWED_HOSTS = ["*"]
-    DEFAULT_FROM_EMAIL = 'webmaster@example.com'
-    # Database
-    DATABASES = {
-        #  DEV
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': 'django',
-            'USER': 'daibeisi',
-            'PASSWORD': 'e0@M3bP.90jwoSF!a9',
-            'HOST': '127.0.0.1',
-            'PORT': 5432,
-        }
+} if CURRENT_ENV == 'prod' else {
+    #  DEV
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'django',
+        'USER': 'daibeisi',
+        'PASSWORD': 'e0@M3bP.90jwoSF!a9',
+        'HOST': '127.0.0.1',
+        'PORT': 5432,
     }
+}
 
 # Application definition
 # 新建app需要加到这里
@@ -73,12 +61,13 @@ INSTALLED_APPS = [
     'django.contrib.messages',  # 消息框架
     'django.contrib.staticfiles',  # 管理静态文件的框架
     # 注册引入应用
+    'haystack',
     'ckeditor',
     'ckeditor_uploader',
     # 注册自定义应用
-    'Apps.base',
-    'Apps.company',
     'Apps.blog',
+    'Apps.comments',
+    'Apps.company'
 ]
 
 # TODO:使用自定义用户模型，完善user应用程序
@@ -113,6 +102,10 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+            ],
+            # 添加如下配置，即可不用每个模板中添加{% load static %}
+            'builtins' : [
+                'django.templatetags.static'
             ],
         },
     },
@@ -155,14 +148,13 @@ USE_TZ = False
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 # 静态文件的路由（url）地址
-STATIC_URL = 'static/'
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static')
-]
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 STATIC_ROOT = '/static/'
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'upload')  # 上传的文件路径
-MEDIA_URL = '/upload/'  # 上传文件url前缀
+MEDIA_URL = '/media/'  # 上传文件url前缀
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # 上传的文件路径
+
 
 # TODO:配置登陆的url
 
@@ -211,37 +203,28 @@ CKEDITOR_CONFIGS = {
     },
 }
 
-# TODO:待完成
-# HAYSTACK_CONNECTIONS = {
-#     'default': {
-#         'ENGINE': 'blog.whoosh_backend_cn.WhooshEngine',
-#         'PATH': os.path.join(BASE_DIR, 'whoosh_index'),
-#     },
-# }
-# HAYSTACK_SEARCH_RESULTS_PER_PAGE = 6
-# HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
+HAYSTACK_CONNECTIONS = {
+    'default': {
+        # 指定了Django HAYSTACK要使用的搜索引擎，whoosh_backend_cn就是我们修改的文件
+        'ENGINE': 'StudyDjango.whoosh_backend_cn.WhooshEngine',
+        # 指定搜索文件存放的位置
+        'PATH': os.path.join(BASE_DIR, 'whoosh_index'),
+    },
+}
+# 指定搜索结果分页方式为每页6条记录
+HAYSTACK_SEARCH_RESULTS_PER_PAGE = 6
+# 指定实时更新索引，当有数据改变时，自动更新索引
+HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 # TODO: 缓存
-
 # python manage.py createcachetable
 # CACHES = {
 #     'default': {
 #         'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
 #         'LOCATION': 'my_cache_table',
-#     }
-# }
-
-# CACHES = {
-#     'default': {
-#         'BACKEND': 'django.core.cache.backends.redis.RedisCache',  # Django 4.0中新功能
-#         'LOCATION': [
-#             'redis://127.0.0.1:6379', # leader
-#             'redis://127.0.0.1:6378', # read-replica 1
-#             'redis://127.0.0.1:6377', # read-replica 2
-#         ],
 #     }
 # }
 
