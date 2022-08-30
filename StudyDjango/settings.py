@@ -19,34 +19,24 @@ BASE_DIR = Path(__file__).resolve().parent.parent  # 获取项目的根路径
 """关键配置"""
 CURRENT_ENV = os.environ.get('CURRENT_ENV', "dev")
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY', "******")
+SECRET_KEY = os.environ.get('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False if CURRENT_ENV == 'prod' else True
 # 该配置避免你的站点遭受某些 CSRF 攻击。如果使用了通配符，你必须实现自定义的 Host HTTP 头，或者确保你不会很容易地遭受此种攻击。
-ALLOWED_HOSTS = ["*"] if CURRENT_ENV == 'prod' else ["*"]
+ALLOWED_HOSTS = ['*'] if CURRENT_ENV == 'prod' else ['127.0.0.1']
 # 默认电子邮件地址，用于网站管理员的各种自动通信。这不包括发送到ADMINS和MANAGERS的错误信息
 DEFAULT_FROM_EMAIL = 'webmaster@example.com'
+
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 DATABASES = {
-    #  PROD
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('POSTGRES_NAME'),
-        'USER': os.environ.get('POSTGRES_USER'),
-        'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
-        'HOST': 'db',
-        'PORT': 5432,
-    }
-} if CURRENT_ENV == 'prod' else {
-    #  DEV
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'django',
-        'USER': 'daibeisi',
-        'PASSWORD': 'e0@M3bP.90jwoSF!a9',
-        'HOST': '127.0.0.1',
-        'PORT': 5432,
+        'NAME': os.environ.get('DB_NAME'),
+        'USER': os.environ.get('DB_USER'),
+        'PASSWORD': os.environ.get('DB_PASSWORD'),
+        'HOST': os.environ.get('DB_HOST', '127.0.0.1'),
+        'PORT': os.environ.get('DB_PORT', 5432),
     }
 }
 
@@ -65,14 +55,14 @@ INSTALLED_APPS = [
     'ckeditor',
     'ckeditor_uploader',
     # 注册自定义应用
-    'Apps.blog',
-    'Apps.comments',
-    'Apps.company'
+    # 'Apps.blog',
+    # 'Apps.comments',
+    # 'Apps.company'
 ]
 
 # TODO:使用自定义用户模型，完善user应用程序
 # 设置认证系统中使用的用户模型, 例如这里指定为使用user应用程序中User模型
-AUTH_USER_MODEL = "blog.BlogUser"
+# AUTH_USER_MODEL = "blog.BlogUser"
 
 # 中间件，响应前自动处理
 MIDDLEWARE = [

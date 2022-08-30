@@ -8,7 +8,7 @@ from django.contrib.auth.models import AbstractUser
 # Create your models here.
 class Category(models.Model):
     name = models.CharField(verbose_name="分类名", max_length=30)
-    remark = models.TextField(verbose_name="备注",blank=True)
+    remark = models.TextField(verbose_name="备注", blank=True)
 
     def __str__(self):
         return self.name
@@ -20,7 +20,7 @@ class Category(models.Model):
 
 class Tag(models.Model):
     name = models.CharField(verbose_name="标签名", max_length=30)
-    remark = models.TextField(verbose_name="备注",blank=True)
+    remark = models.TextField(verbose_name="备注", blank=True)
 
     def __str__(self):
         return self.name
@@ -33,14 +33,13 @@ class Tag(models.Model):
 class Blog(models.Model):
     title = models.CharField(verbose_name="标题", max_length=80)
     body = RichTextUploadingField(config_name='default', verbose_name="内容")
-    abstract = models.TextField(verbose_name="摘要",blank=True)
+    abstract = models.TextField(verbose_name="摘要", blank=True)
     create_time = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
     edit_time = models.DateTimeField(verbose_name="修改时间", auto_now=True)
     category = models.ForeignKey(to="Category", on_delete=models.CASCADE, verbose_name="分类")
     tags = models.ManyToManyField(to="Tag", blank=True, verbose_name="标签")
     author = models.ForeignKey(to="blog.BlogUser", on_delete=models.CASCADE, verbose_name="作者")
     view = models.IntegerField(default=0, verbose_name="查看次数")
-
 
     def get_absolute_url(self):
         return reverse("blog:detail", kwargs={"pk": self.pk})
@@ -53,14 +52,14 @@ class Blog(models.Model):
     def save(self, *args, **kwargs):
         if not self.abstract:
             self.abstract = strip_tags(self.body)[:118]
-        super(Blog,self).save(*args, **kwargs)
+        super(Blog, self).save(*args, **kwargs)
 
     def __str__(self):
         return self.title
 
     class Meta:
-        verbose_name="博文信息"
-        verbose_name_plural="博文信息"
+        verbose_name = "博文信息"
+        verbose_name_plural = "博文信息"
         ordering = ("-create_time",)
         unique_together = ("title", "author")
 
@@ -74,5 +73,5 @@ class BlogUser(AbstractUser):
         return self.username
 
     class Meta:
-        verbose_name="用户信息表"
-        verbose_name_plural=verbose_name
+        verbose_name = "用户表"
+        verbose_name_plural = verbose_name
