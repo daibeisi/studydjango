@@ -155,7 +155,6 @@ STATIC_ROOT = '/static/'
 MEDIA_URL = '/media/'  # 上传文件url前缀
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # 上传的文件路径
 
-
 # TODO:配置登陆的url
 
 # TODO:session设置
@@ -170,20 +169,20 @@ CKEDITOR_CONFIGS = {
     # 配置名是default时，django-ckeditor默认使用这个设置
     'default': {
         'toolbar': (
-			['div','Source','-','Save','NewPage','Preview','-','Templates'],
-			['Cut','Copy','Paste','PasteText','PasteFromWord','-','Print','SpellChecker','Scayt'],
-			['Undo','Redo','-','Find','Replace','-','SelectAll','RemoveFormat'],
-			['Form','Checkbox','Radio','TextField','Textarea','Select','Button', 'ImageButton','HiddenField'],
-			['Bold','Italic','Underline','Strike','-','Subscript','Superscript'],
-			['NumberedList','BulletedList','-','Outdent','Indent','Blockquote'],
-			['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
-			['Link','Unlink','Anchor'],
-			['Image','Flash','Table','HorizontalRule','Smiley','SpecialChar','PageBreak'],
-			['Styles','Format','Font','FontSize'],
-			['TextColor','BGColor'],
-			['Maximize','ShowBlocks','-','About', 'pbckcode'],
-		),
-	},
+            ['div', 'Source', '-', 'Save', 'NewPage', 'Preview', '-', 'Templates'],
+            ['Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Print', 'SpellChecker', 'Scayt'],
+            ['Undo', 'Redo', '-', 'Find', 'Replace', '-', 'SelectAll', 'RemoveFormat'],
+            ['Form', 'Checkbox', 'Radio', 'TextField', 'Textarea', 'Select', 'Button', 'ImageButton', 'HiddenField'],
+            ['Bold', 'Italic', 'Underline', 'Strike', '-', 'Subscript', 'Superscript'],
+            ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', 'Blockquote'],
+            ['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'],
+            ['Link', 'Unlink', 'Anchor'],
+            ['Image', 'Flash', 'Table', 'HorizontalRule', 'Smiley', 'SpecialChar', 'PageBreak'],
+            ['Styles', 'Format', 'Font', 'FontSize'],
+            ['TextColor', 'BGColor'],
+            ['Maximize', 'ShowBlocks', '-', 'About', 'pbckcode'],
+        ),
+    },
     # 设置另一个django-ckeditor配置
     'test': {
         # 使用简体中文
@@ -192,7 +191,7 @@ CKEDITOR_CONFIGS = {
         'width': '660px',
         'height': '200px',
         # 设置工具栏为自定义，名字为Custom
-        'toolbar':'Custom',
+        'toolbar': 'Custom',
         # 添加富文本编辑器的工具栏按钮
         'toolbar_Custom': [
             ['Bold', 'Italic', 'Underline'],
