@@ -104,7 +104,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
             ],
             # 添加如下配置，即可不用每个模板中添加{% load static %}
-            'builtins' : [
+            'builtins': [
                 'django.templatetags.static'
             ],
         },

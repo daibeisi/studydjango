@@ -29,7 +29,7 @@ admin.site.site_title = '呆贝斯管理系统'
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('ckeditor/', include('ckeditor_uploader.urls')),
-    path('search/',include('haystack.urls')),
+    path('search/', include('haystack.urls')),
     path('favicon.ico', RedirectView.as_view(url='/static/favicon.ico')),
     path('', include('Apps.base.urls', namespace="base")),
     path('comments/', include('Apps.comments.urls')),

@@ -13,4 +13,5 @@ class UserInfoAdmin(admin.ModelAdmin):
         # 'address'
     )
 
+
 admin.site.register(UserInfo, UserInfoAdmin)
