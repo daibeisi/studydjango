@@ -31,7 +31,7 @@ urlpatterns = [
     path('ckeditor/', include('ckeditor_uploader.urls')),
     path('search/', include('haystack.urls')),
     path('favicon.ico', RedirectView.as_view(url='/static/favicon.ico')),
-    # path('', include('Apps.base.urls', namespace="base")),
+    path('', include('Apps.base.urls', namespace="base")),
     # path('comments/', include('Apps.comments.urls')),
     # path('company/', include('Apps.company.urls', namespace="company")),
     # path('blog/', include('Apps.blog.urls', namespace="blog")),

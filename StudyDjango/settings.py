@@ -55,7 +55,7 @@ INSTALLED_APPS = [
     'ckeditor',
     'ckeditor_uploader',
     # 注册自定义应用
-    # 'Apps.blog',
+    'Apps.base',
     # 'Apps.comments',
     # 'Apps.company'
 ]
