@@ -66,7 +66,7 @@ INSTALLED_APPS = [
 
 # 中间件，响应前自动处理
 MIDDLEWARE = [
-    'Apps.base.middleware.TestMiddleware1',
+    'middleware.test_middleware.TestMiddleware1',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -74,7 +74,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'Apps.base.middleware.TestMiddleware2'
+    'middleware.test_middleware.TestMiddleware2'
 ]
 
 # 指项目文件下同名文件夹下的urls，项目改名字这里也要改
@@ -145,9 +145,20 @@ STATIC_ROOT = '/static/'
 MEDIA_URL = '/media/'  # 上传文件url前缀
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # 上传的文件路径
 
-# TODO:配置登陆的url
+# 登陆url和登陆后跳转url
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = '/index/'
 
-# TODO:session设置
+# session设置
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # 引擎（默认）
+SESSION_COOKIE_NAME = "sessionid"  # Session的cookie保存在浏览器上时的key，即：sessionid＝随机字符串（默认）
+SESSION_COOKIE_PATH = "/"  # Session的cookie保存的路径（默认）
+SESSION_COOKIE_DOMAIN = None  # Session的cookie保存的域名（默认）
+SESSION_COOKIE_SECURE = False  # 是否Https传输cookie（默认）
+SESSION_COOKIE_HTTPONLY = True  # 是否Session的cookie只支持http传输（默认）
+SESSION_COOKIE_AGE = 1209600  # Session的cookie失效日期（2周）（默认）
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False  # 是否关闭浏览器使得Session过期（默认）
+SESSION_SAVE_EVERY_REQUEST = False  # 是否每次请求都保存Session，默认修改之后才保存（默认）
 
 # ckeditor设置
 CKEDITOR_UPLOAD_PATH = 'ckeditor/'  # 设置富文本编辑器的上传文件的相对路径
@@ -208,13 +219,13 @@ HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
-# TODO: 缓存
-# python manage.py createcachetable
-# CACHES = {
-#     'default': {
-#         'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
-#         'LOCATION': 'my_cache_table',
-#     }
-# }
+# 缓存设置
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+        'LOCATION': 'django_cache',
+    }
+}
+# 执行创建表命令python manage.py createcachetable
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
