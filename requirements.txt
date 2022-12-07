@@ -9,3 +9,4 @@ whoosh
 django_haystack
 jieba
 uvicorn
+djangorestframework

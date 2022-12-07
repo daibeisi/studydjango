@@ -19,7 +19,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent  # 获取项目的根路径
 """关键配置"""
 CURRENT_ENV = os.environ.get('CURRENT_ENV', "dev")
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY')
+SECRET_KEY = os.environ.get('SECRET_KEY', "123456")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False if CURRENT_ENV == 'prod' else True
 # 该配置避免你的站点遭受某些 CSRF 攻击。如果使用了通配符，你必须实现自定义的 Host HTTP 头，或者确保你不会很容易地遭受此种攻击。
@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     'haystack',
     'ckeditor',
     'ckeditor_uploader',
+    'rest_framework',
     # 注册自定义应用
     'Apps.base',
     # 'Apps.comments',
@@ -139,6 +140,16 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = False
+
+REST_FRAMEWORK = {
+    # Use Django's standard `django.contrib.auth` permissions,
+    # or allow read-only access for unauthenticated users.
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly',
+        'rest_framework.pagination.PageNumberPagination',
+    ],
+    'PAGE_SIZE': 10
+}
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
