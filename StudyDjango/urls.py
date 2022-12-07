@@ -33,6 +33,7 @@ urlpatterns = [
     path('favicon.ico', RedirectView.as_view(url='/static/favicon.ico')),
     path('', include('Apps.base.urls', namespace="base")),
     path('drf/', include('Apps.study_drf.urls', namespace="study_drf")),
+    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     # path('comments/', include('Apps.comments.urls')),
     # path('company/', include('Apps.company.urls', namespace="company")),
     # path('blog/', include('Apps.blog.urls', namespace="blog")),
