@@ -8,3 +8,4 @@ django-ckeditor
 whoosh
 django_haystack
 jieba
+uvicorn

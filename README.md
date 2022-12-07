@@ -32,3 +32,8 @@ Getting started with DjangoStudy
 + 消息队列
 + 日志
   1. 日志可视化
++ 异步支持
+  1. Uvicorn启动
+  2. Daphne启动
++ 分布式
++ 分库

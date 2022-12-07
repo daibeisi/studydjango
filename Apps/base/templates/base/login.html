@@ -11,19 +11,19 @@
 	</head>
 
 	<body>
-        <div class="login">
+        <div class="login" align="center">
             {% csrf_token %}
             <h2>用户登录</h2>
             <div class="login_box">
 				<!-- required就是不能为空  必须在css效果中有很大的作用 -->
+                <label for="name" >用户名</label>
 				<input type="text" name='username' id='username' required  />
-				<label for="name" >用户名</label>
             </div>
             <div class="login_box">
+                <label for="pwd">密码</label>
 				<input type="password" name='password' id='password' required="required">
-				<label for="pwd">密码</label>
             </div>
-            <a id="denglu">登录<span></span><span></span><span></span><span></span></a>
+            <button id="denglu" type="button">登录</button>
 		 </div>
 	</body>
     <script>
@@ -35,7 +35,10 @@
             const body = "username=" + username + "&password=" + password
             fetch('/login/', {
                 method: 'POST',
-                headers: {'X-CSRFToken': csrftoken, 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
+                headers: {
+                    'X-CSRFToken': csrftoken,
+                    'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+                },
                 mode: 'same-origin', // Do not send CSRF token to another domain.
                 body: body,
             })

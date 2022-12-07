@@ -20,7 +20,7 @@ RUN mv /etc/apt/sources.list /etc/apt/sources.list.bak \
     && pip install --no-cache-dir -r requirements.txt -i https://mirrors.aliyun.com/pypi/simple/ \
     && ln -s /Django/DjangoServer.conf /etc/nginx/sites-enabled
 # 声明端口
-#EXPOSE 8000
+EXPOSE 8000
 # 设置默认执行的命令，docker run 时运行
-# CMD XXX
+CMD []
 #LABEL org.opencontainers.image.authors="daibeisi"

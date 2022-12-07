@@ -1,5 +1,6 @@
 from django.utils.deprecation import MiddlewareMixin  # 中间件必须继承这个类
 
+
 class TestMiddleware1(MiddlewareMixin):
 
     def process_request(self, request):
