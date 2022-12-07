@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     'rest_framework',
     # 注册自定义应用
     'Apps.base',
+    'Apps.study_drf',
     # 'Apps.comments',
     # 'Apps.company'
 ]

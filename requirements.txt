@@ -1,12 +1,21 @@
 Django==3.2
+
+# 数据库相关
 psycopg2
 # PyMySQL
-uwsgi
+
+# 扩展
 requests
 pillow
 django-ckeditor
 whoosh
 django_haystack
 jieba
+
+# 部署相关
+uwsgi
 uvicorn
+
+# DRF相关
 djangorestframework
+pygments  # We'll be using this for the code highlighting
