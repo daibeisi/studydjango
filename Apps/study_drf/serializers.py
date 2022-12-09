@@ -4,9 +4,11 @@ from .models import Snippet, LANGUAGE_CHOICES, STYLE_CHOICES
 
 
 class UserSerializer(serializers.ModelSerializer):
+    snippets = serializers.PrimaryKeyRelatedField(many=True, queryset=Snippet.objects.all())
+
     class Meta:
         model = User
-        fields = ['username', 'email', 'groups']
+        fields = ['id', 'username', 'snippets']
 
 
 class GroupSerializer(serializers.ModelSerializer):
