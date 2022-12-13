@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User, Group
 from rest_framework import permissions
-from .serializers import UserSerializer, GroupSerializer
-from .models import Snippet
+from .serializers import UserSerializer, GroupSerializer, StudentSerializer, ClassSerializer
+from .models import Snippet, Student, Class
 from .serializers import SnippetSerializer
 from .permissions import IsOwnerOrReadOnly
 from rest_framework import generics
@@ -57,9 +57,31 @@ class SnippetHighlight(generics.GenericAPIView):
         return Response(snippet.highlighted)
 
 
+class StudentList(generics.ListAPIView):
+    queryset = Student.objects.all()
+    serializer_class = StudentSerializer
+
+
+class StudentDetail(generics.RetrieveAPIView):
+    queryset = Student.objects.all()
+    serializer_class = StudentSerializer
+
+
+class ClassList(generics.ListAPIView):
+    queryset = Class.objects.all()
+    serializer_class = ClassSerializer
+
+
+class ClassDetail(generics.RetrieveAPIView):
+    queryset = Class.objects.all()
+    serializer_class = ClassSerializer
+
+
 @api_view(['GET'])
 def api_root(request, format=None):
     return Response({
         'users': reverse('Apps.study_drf:user-list', request=request, format=format),
-        'snippets': reverse('Apps.study_drf:snippet-list', request=request, format=format)
+        'snippets': reverse('Apps.study_drf:snippet-list', request=request, format=format),
+        'students': reverse('Apps.study_drf:student-list', request=request, format=format),
+        'classes': reverse('Apps.study_drf:class-list', request=request, format=format)
     })

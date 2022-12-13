@@ -20,6 +20,10 @@ urlpatterns = [
     path('users/<int:pk>/', views.UserDetail.as_view(), name='user-detail'),
     path('groups/', views.GroupList.as_view(), name='group-list'),
     path('groups/<int:pk>/', views.GroupDetail.as_view(), name='group-detail'),
+    path('students/', views.StudentList.as_view(), name='student-list'),
+    path('students/<int:pk>/', views.StudentDetail.as_view(), name='student-detail'),
+    path('classes/', views.ClassList.as_view(), name='class-list'),
+    path('classes/<int:pk>/', views.ClassDetail.as_view(), name='class-detail'),
     path('', views.api_root),
 ]
 

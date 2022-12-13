@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User, Group
-from .models import Snippet
+from .models import Snippet, Student, Class
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
@@ -45,3 +45,18 @@ class SnippetSerializer(serializers.HyperlinkedModelSerializer):
         instance.style = validated_data.get('style', instance.style)
         instance.save()
         return instance
+
+
+class StudentSerializer(serializers.HyperlinkedModelSerializer):
+    snippets = serializers.HyperlinkedRelatedField(many=True, read_only=True,
+                                                   view_name='Apps.study_drf:student-detail')
+
+    class Meta:
+        model = Student
+        fields = ['id', 'username', 'snippets']
+
+
+class ClassSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Class
+        fields = ['id', 'name']
