@@ -9,6 +9,8 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 import os
 from pathlib import Path
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent  # 获取项目的根路径
@@ -133,14 +135,14 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
 LANGUAGE_CODE = 'zh-hans'  # 语言格式
+USE_I18N = False  # 是否使用国际化 (i18n) 功能
+# LOCALE_PATHS = [os.path.join(BASE_DIR, 'locale')]  # 设置以指定 Django 应在何处查找翻译文件
 
 TIME_ZONE = 'Asia/Shanghai'  # 设置时区
 
-USE_I18N = True
+USE_L10N = False  # 用于决定是否开启数据本地化。如果此设置为True，例如Django将使用当前语言环境的格式显示数字和日期。
 
-USE_L10N = True
-
-USE_TZ = False
+USE_TZ = False  # 指定是否使用指定的时区(TIME_ZONE)的时间
 
 # Django REST Framework 相关设置
 REST_FRAMEWORK = {
@@ -262,5 +264,21 @@ LOGGING = {
         },
     },
 }
+
+sentry_sdk.init(
+    dsn="https://0937e34e2f04422b958894b31750a8b4@o4503963655667712.ingest.sentry.io/4503963657699328",
+    integrations=[
+        DjangoIntegration(),
+    ],
+
+    # Set traces_sample_rate to 1.0 to capture 100%
+    # of transactions for performance monitoring.
+    # We recommend adjusting this value in production.
+    traces_sample_rate=1.0,
+
+    # If you wish to associate users to errors (assuming you are using
+    # django.contrib.auth) you may enable sending PII data.
+    send_default_pii=True
+)
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
