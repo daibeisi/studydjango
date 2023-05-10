@@ -6,7 +6,7 @@ FROM python:3
 
 # 相当于设置 python 命令行的 -u 选项
 # 不缓冲stdin、stdout和stderr，默认是缓冲的。
-ENV PYTHONUNBUFFERED=1
+#ENV PYTHONUNBUFFERED=1
 
 WORKDIR /Django
 COPY . /Django/

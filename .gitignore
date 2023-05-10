@@ -1,6 +1,6 @@
 .idea
-*/migrations/*
-!*/migrations/__init__.py
+!*/migrations/*
 upload
 log
 data
+/Apps/study_drf/migrations/0001_initial.py
