@@ -1,62 +1,54 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User, Group
+from rest_framework.validators import UniqueValidator
+
 from .models import Snippet, Student, Class
-
-
-class UserSerializer(serializers.HyperlinkedModelSerializer):
-    snippets = serializers.HyperlinkedRelatedField(many=True, read_only=True,
-                                                   view_name='Apps.study_drf:snippet-detail')
-
-    class Meta:
-        model = User
-        fields = ['url', 'id', 'username', 'snippets']
 
 
 class GroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = Group
-        fields = ['name']
+        fields = "__all__"
 
 
-class SnippetSerializer(serializers.HyperlinkedModelSerializer):
-    owner = serializers.ReadOnlyField(source='owner.username')
-    highlight = serializers.HyperlinkedIdentityField(view_name='Apps.study_drf:snippet-highlight',
-                                                     format='html')
+class SnippetSerializer(serializers.ModelSerializer):
+    owner = serializers.SerializerMethodField()
+    highlighted = serializers.ReadOnlyField()
 
     class Meta:
         model = Snippet
-        fields = ['url', 'id', 'highlight', 'owner', 'title',
-                  'code', 'linenos', 'language', 'style']
+        fields = "__all__"
 
-    def create(self, validated_data):
-        """
-        Create and return a new `Snippet` instance, given the validated data.
-        """
-        return Snippet.objects.create(**validated_data)
-
-    def update(self, instance, validated_data):
-        """
-        Update and return an existing `Snippet` instance, given the validated data.
-        """
-        instance.title = validated_data.get('title', instance.title)
-        instance.code = validated_data.get('code', instance.code)
-        instance.linenos = validated_data.get('linenos', instance.linenos)
-        instance.language = validated_data.get('language', instance.language)
-        instance.style = validated_data.get('style', instance.style)
-        instance.save()
-        return instance
+    def get_owner(self, obj):
+        """ 处理自定义的字段 owner, 通过外键获取 UserModel 的数据 """
+        return obj.owner.username
 
 
-class StudentSerializer(serializers.HyperlinkedModelSerializer):
-    snippets = serializers.HyperlinkedRelatedField(many=True, read_only=True,
-                                                   view_name='Apps.study_drf:student-detail')
+class UserSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(label="账号", required=True, allow_blank=False,
+                                     validators=[UniqueValidator(queryset=User.objects.all())])
+    password = serializers.CharField(style={'input_type': 'password'}, label="密码", write_only=True)
+    groups = GroupSerializer(many=True, read_only=True)
 
     class Meta:
+        model = User
+        fields = ['id', 'username', 'email', 'password', 'is_staff', 'is_active', 'is_superuser',
+                  'groups', 'user_permissions']
+
+    def create(self, validated_data):
+        user = super(UserSerializer, self).create(validated_data=validated_data)
+        user.set_password(validated_data["password"])
+        user.save()
+        return user
+
+
+class StudentSerializer(serializers.ModelSerializer):
+    class Meta:
         model = Student
-        fields = ['id', 'username', 'snippets']
+        fields = "__all__"
 
 
 class ClassSerializer(serializers.ModelSerializer):
     class Meta:
         model = Class
-        fields = ['id', 'name']
+        fields = "__all__"

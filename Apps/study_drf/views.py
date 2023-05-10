@@ -11,8 +11,8 @@ from rest_framework.reverse import reverse
 from rest_framework import renderers
 
 
-class UserList(generics.ListAPIView):
-    queryset = User.objects.all()
+class UserList(generics.ListCreateAPIView):
+    queryset = User.objects.all().order_by('id')
     serializer_class = UserSerializer
 
 
@@ -22,7 +22,7 @@ class UserDetail(generics.RetrieveAPIView):
 
 
 class GroupList(generics.ListAPIView):
-    queryset = Group.objects.all()
+    queryset = Group.objects.all().order_by('id')
     serializer_class = GroupSerializer
 
 
@@ -57,22 +57,22 @@ class SnippetHighlight(generics.GenericAPIView):
         return Response(snippet.highlighted)
 
 
-class StudentList(generics.ListAPIView):
+class StudentList(generics.ListCreateAPIView):
     queryset = Student.objects.all()
     serializer_class = StudentSerializer
 
 
-class StudentDetail(generics.RetrieveAPIView):
+class StudentDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Student.objects.all()
     serializer_class = StudentSerializer
 
 
-class ClassList(generics.ListAPIView):
+class ClassList(generics.ListCreateAPIView):
     queryset = Class.objects.all()
     serializer_class = ClassSerializer
 
 
-class ClassDetail(generics.RetrieveAPIView):
+class ClassDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Class.objects.all()
     serializer_class = ClassSerializer
 

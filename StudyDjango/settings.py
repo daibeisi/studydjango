@@ -76,7 +76,6 @@ INSTALLED_APPS = [
 
 # 中间件，响应前自动处理
 MIDDLEWARE = [
-    'middleware.test_middleware.TestMiddleware1',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -84,7 +83,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'middleware.test_middleware.TestMiddleware2'
+    'utils.middleware.TestMiddleware'  # 自定义中间件
 ]
 
 # 指项目文件下同名文件夹下的urls，项目改名字这里也要改
@@ -152,7 +151,36 @@ REST_FRAMEWORK = {
     #     'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
     # ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 10
+    'PAGE_SIZE': 10,
+    # 身份认证后端——如果有多个认证，则有一个认证通过就算认证成功
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.BasicAuthentication',   # 基本认证 —— 请求的时候传递用户名和密码，进行身份认证
+        # 在drf视图(APIView)处理一个请求的过程中，会提取cookie中的sessionid，并在缓存中获取用户数据
+        # 'rest_framework.authentication.SessionAuthentication',  # session认证
+        # ......
+    ),
+    # 权限认证后端,有多个权限后端，遵循最严格的
+    'DEFAULT_PERMISSION_CLASSES': (
+        # 'rest_framework.permissions.IsAuthenticated', # 只有经过身份认证确定用户身份才能访问
+        # 'rest_framework.permissions.IsAdminUser', # is_staff=True才能访问 —— 管理员(员工)权限
+        'rest_framework.permissions.AllowAny',  # 允许所有
+        # 'rest_framework.permissions.IsAuthenticatedOrReadOnly', # 有身份 或者 只读访问(self.list,self.retrieve)
+    ),
+    # 流量限制后端
+    'DEFAULT_THROTTLE_CLASSES': (
+        # 'rest_framework.throttling.AnonRateThrottle', # 限制匿名用户访问限制
+        # 'rest_framework.throttling.UserRateThrottle', # 非匿名用户访问限制
+        'rest_framework.throttling.ScopedRateThrottle',  # 自定义限流后端
+    ),
+    # 流量(请求次数)限制频率
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '3/day',  # 匿名用户访问次数     3/day  3/hour  3/second  3/minute
+        'user': '5/day',  # 非匿名用户访问次数
+
+        # 自定义限流后端的访问次数规则
+        'books': '3/day',
+        'heroes': '5/day'
+    },
 }
 
 # Static files (CSS, JavaScript, Images)
@@ -160,8 +188,8 @@ REST_FRAMEWORK = {
 
 # 静态文件的路由（url）地址
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 STATIC_ROOT = '/static/'
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
 MEDIA_URL = '/media/'  # 上传文件url前缀
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # 上传的文件路径
@@ -180,6 +208,20 @@ SESSION_COOKIE_HTTPONLY = True  # 是否Session的cookie只支持http传输（�
 SESSION_COOKIE_AGE = 1209600  # Session的cookie失效日期（2周）（默认）
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False  # 是否关闭浏览器使得Session过期（默认）
 SESSION_SAVE_EVERY_REQUEST = False  # 是否每次请求都保存Session，默认修改之后才保存（默认）
+SESSION_CACHE_ALIAS = "default"  # 指定session使用的缓存配置
+
+# csrf设置
+CSRF_COOKIE_AGE = None  # CSRF cookie 的寿命，以秒为单位。
+CSRF_COOKIE_DOMAIN = None  # 设置 CSRF cookie 时要使用的域
+CSRF_COOKIE_HTTPONLY = False  # 是否对 CSRF cookie 使用 HttpOnly 标志
+CSRF_COOKIE_NAME = "csrftoken"  # 用于 CSRF 认证令牌的 cookie 的名称
+CSRF_COOKIE_PATH = "/"  # 在 CSRF cookie 上设置的路径
+CSRF_COOKIE_SAMESITE = "Lax"  # CSRF cookie 上 SameSite 标志的值。该标志可防止在跨站点请求中发送 cookie。
+CSRF_COOKIE_SECURE = False  # 是否为 CSRF cookie 使用安全 cookie
+CSRF_USE_SESSIONS = False  # 是否将 CSRF 标记存储在用户的会话中，而不是 cookie 中
+CSRF_FAILURE_VIEW = 'django.views.csrf.csrf_failure'  # 当传入的请求被 CSRF 保护 拒绝时，要使用的视图函数的点分隔路径
+CSRF_HEADER_NAME = 'HTTP_X_CSRFTOKEN'  # 用于 CSRF 认证的请求头的名称。
+CSRF_TRUSTED_ORIGINS = []  # 不安全请求的可信来源列表
 
 # ckeditor设置
 CKEDITOR_UPLOAD_PATH = 'ckeditor/'  # 设置富文本编辑器的上传文件的相对路径
@@ -247,24 +289,76 @@ CACHES = {
         'LOCATION': 'django_cache',
     }
 }
+# CACHES = {
+#     # 默认存储信息: 存到 0 号库
+#     "default": {
+#         "BACKEND": "django_redis.cache.RedisCache",
+#         "LOCATION": "redis://192.168.0.100:6379/0",
+#         "OPTIONS": {
+#             "CLIENT_CLASS": "django_redis.client.DefaultClient",
+#         }
+#     }
+# }
 
 # 日志设置
+# LOGGING = {
+#     'version': 1,
+#     'disable_existing_loggers': False,
+#     'handlers': {
+#         'console': {
+#             'class': 'logging.StreamHandler',
+#         },
+#     },
+#     'loggers': {
+#         'django': {
+#             'handlers': ['console'],
+#             'level': 'INFO',
+#         },
+#     },
+# }
+LOG_PATH = os.path.join(BASE_DIR, 'log')
 LOGGING = {
     'version': 1,
+    # 禁用日志
     'disable_existing_loggers': False,
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-        },
-    },
     'loggers': {
-        'django': {
+        '': {
+            # 将系统接受到的体制，交给handler去处理
             'handlers': ['console'],
             'level': 'INFO',
-        },
+        }
     },
+    'handlers': {
+        'default': {
+            'level': 'INFO',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': '%s/%s' % (LOG_PATH, 'django.log'),
+            'maxBytes': 1024 * 1024 * 5,  # 文件大小
+            'backupCount': 5,  # 备份数
+            # 'formatter': 'standard',  # 输出格式
+            'encoding': 'utf-8',  # 设置默认编码，否则打印出来汉字乱码
+        },
+        'console': {
+            'level': 'INFO',
+            # handler将日志信息存放在day6/logs/sys.log
+            'filename': '%s/%s' % (LOG_PATH, 'django.log'),
+            # 指定日志的格式
+            'formatter': '',
+            # 备份
+            'class': 'logging.handlers.RotatingFileHandler',
+            # 日志文件大小：5M
+            'maxBytes': 5 * 1024 * 1024,
+            'encoding': "utf-8"
+        }
+    },
+    'formatters': {
+        'default': {
+            'format': '%(asctime)s %(message)s'
+        }
+    }
 }
 
+# 错误日志管理系统
 sentry_sdk.init(
     dsn="https://0937e34e2f04422b958894b31750a8b4@o4503963655667712.ingest.sentry.io/4503963657699328",
     integrations=[

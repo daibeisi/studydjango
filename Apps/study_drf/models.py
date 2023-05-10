@@ -24,7 +24,12 @@ class Snippet(models.Model):
     highlighted = models.TextField()
 
     class Meta:
+        verbose_name = "代码片段"
+        verbose_name_plural = "代码片段表"
         ordering = ['created']
+
+    def __str__(self):
+        return "%s" % self.title
 
     def save(self, *args, **kwargs):
         """
@@ -45,14 +50,22 @@ class Class(models.Model):
 
     class Meta:
         verbose_name = "班级信息"
-        verbose_name_plural = "班级信息"
+        verbose_name_plural = "班级信息表"
+        ordering = ['id']
+
+    def __str__(self):
+        return "%s" % self.name
 
 
 class Student(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, blank=False, null=False, verbose_name="Product")
+    user = models.OneToOneField(User, on_delete=models.CASCADE, blank=False, null=False, verbose_name="用户")
     sex = models.IntegerField(db_column='sex', verbose_name="性别", choices=[(0, "女"), (1, "男")])
     owner_class = models.ForeignKey(to="Class", on_delete=models.CASCADE, verbose_name="班级")
 
     class Meta:
         verbose_name = "学生信息"
-        verbose_name_plural = "学生信息"
+        verbose_name_plural = "学生信息表"
+        ordering = ['id']
+
+    def __str__(self):
+        return "%s" % self.user.username
