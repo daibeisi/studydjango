@@ -125,9 +125,17 @@ else:
     ALLOWED_HOSTS = ["*"]
 
     DATABASES = {
+        # "default": {
+        #     "ENGINE": "django.db.backends.sqlite3",
+        #     "NAME": BASE_DIR / "db.sqlite3",
+        # }
         "default": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / "db.sqlite3",
+            "ENGINE": 'django.db.backends.postgresql',
+            "NAME": cf.get(Django_ENV, 'Django_DB_NAME'),
+            "USER": cf.get(Django_ENV, 'Django_DB_USER'),
+            "PASSWORD": cf.get(Django_ENV, 'Django_DB_PASSWORD'),
+            "HOST": cf.get(Django_ENV, 'Django_DB_HOST'),
+            "PORT": cf.getint(Django_ENV, 'Django_DB_PORT'),
         }
     }
 
