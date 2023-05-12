@@ -26,7 +26,7 @@ LABEL maintainer="heyares@163.com"
 ENV TZ "Asia/Shanghai"
 
 RUN apt-get update  \
-    && apt-get install --assume-yes --no-install-recommends -y python3.9 python3-venv nginx\
+    && apt-get install --assume-yes --no-install-recommends -y python3.9 python3-venv  \
     && apt-get clean  \
     && rm -rf /var/lib/apt/lists/*
 
@@ -34,11 +34,9 @@ RUN useradd --create-home django
 COPY --from=builder-image /home/django/venv /home/django/venv
 
 USER django
-RUN mkdir -p /home/django/workspace/code
-WORKDIR /home/django/workspace/code
+RUN mkdir -p /home/django/workspace
+WORKDIR /home/django/workspace
 COPY . .
-
-EXPOSE 8000
 
 # make sure all messages always reach console
 ENV PYTHONUNBUFFERED=1
@@ -49,4 +47,4 @@ ENV PATH="/home/django/venv/bin:$PATH"
 
 # /dev/shm is mapped to shared memory and should be used for gunicorn heartbeat
 # this will improve performance and avoid random freezes
-#CMD ["gunicorn","-c", "gunicorn.conf.py", "--worker-tmp-dir", "/dev/shm", "DjangoProject.wsgi:application"]
+CMD ["gunicorn","-c", "gunicorn.conf.py", "--worker-tmp-dir", "/dev/shm", "DjangoProject.wsgi:application"]

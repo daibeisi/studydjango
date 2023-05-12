@@ -5,7 +5,7 @@ services:
     image: postgres
     restart: always
     volumes:
-      - ./data/db:/var/lib/postgresql/data
+      - ./postgresql/data:/var/lib/postgresql/data
     environment:
       - TZ=Asia/Shanghai
       - POSTGRES_DB=django
@@ -21,18 +21,26 @@ services:
     environment:
       - Django_ENV=production
     volumes:
-      - .:/home/django/workspace/code
+      - .:/home/django/workspace/
     depends_on:
       - db
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1g"
+  nginx:
+    image: nginx
+    restart: always
     ports:
-      - "8000:8000"
-    command:
-      - sh
-      - -c
-      - |
-        gunicorn -c gunicorn.conf.py --worker-tmp-dir /dev/shm DjangoProject.wsgi:application &
-        nginx -c /home/django/workspace/code/nginx.conf
-        nginx -s reload
+      - "80:80"
+      - "443:443"
+    environment:
+      - TZ=Asia/Shanghai
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/cert:/etc/nginx/cert
+      - ./file:/usr/share/nginx/file
+      - ./nginx/log:/var/log/nginx
     logging:
       driver: "json-file"
       options:
