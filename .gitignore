@@ -142,11 +142,10 @@ cython_debug/
 
 DjangoProject.conf
 
-migrations/*.py
+migrations/
 !migrations/__init__.py
 
 file/
-collectstatic/
 whoosh_index/
 django_project_log/
 data/
