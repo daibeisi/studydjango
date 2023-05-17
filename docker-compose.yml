@@ -41,6 +41,8 @@ services:
       - ./nginx/cert:/etc/nginx/cert
       - ./file:/usr/share/nginx/file
       - ./nginx/log:/var/log/nginx
+    depends_on:
+      - backend
     logging:
       driver: "json-file"
       options:

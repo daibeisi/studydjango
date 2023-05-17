@@ -4,7 +4,7 @@ from logging.handlers import WatchedFileHandler
 import os
 import multiprocessing
 
-bind = "0.0.0.0:8001"  # 绑定的ip与端口
+bind = "0.0.0.0:8000"  # 绑定的ip与端口
 backlog = 512  # 监听队列数量，64-2048
 # chdir = '/home/test/server/bin'  #gunicorn要切换到的目的工作目录
 worker_class = 'gevent'  # 使用gevent模式，还可以使用sync 模式，默认的是sync模式
