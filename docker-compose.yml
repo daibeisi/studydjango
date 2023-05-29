@@ -20,8 +20,19 @@ services:
     restart: always
     environment:
       - Django_ENV=production
+      - SENTRY_DSN=https://5d4f9be8c3604527af964e7cdbca733f@o4503963655667712.ingest.sentry.io/4505156966350848
     volumes:
-      - .:/home/django/workspace/
+      - ./Apps/:/home/django/workspace/Apps/
+      - ./daibeisi_tools/:/home/django/workspace/daibeisi_tools/
+      - ./DjangoProject/:/home/django/workspace/DjangoProject/
+      - ./file/:/home/django/workspace/file/
+      - ./middlewares/:/home/django/workspace/middlewares/
+      - ./static/:/home/django/workspace/static/
+      - ./templates/:/home/django/workspace/templates/
+      - ./DjangoProject.conf/:/home/django/workspace/DjangoProject.conf
+      - ./gunicorn.conf.py/:/home/django/workspace/gunicorn.conf.py
+      - ./manage.py:/home/django/workspace/manage.py
+      - ./requirements.txt:/home/django/workspace/requirements.txt
     depends_on:
       - db
     logging:

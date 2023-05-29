@@ -21,8 +21,10 @@ Getting started with DjangoProject
   4. ip黑名单
   5. 接口限流
 + 数据库
-  1. 多数据库
+  1. 多数据库（读写分离，主从复制，分库分表）
   2. 大表优化
+  3. 字段优化（CharField确定长度， 尽量不用TextField）
+  4. 使用索引
 + 缓存
   1. 缓存雪崩
   2. 缓存击穿
@@ -37,3 +39,6 @@ Getting started with DjangoProject
   2. Daphne启动
 + 分布式
 + 分库
++ 性能优化
+  指标：响应时间 最大并发连接数 代码的行数 函数调用次数 内存占用情况 CPU占比
+  1. 使用django-debug-toolbar和django-silk来进行性能监测分析

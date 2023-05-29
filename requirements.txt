@@ -1,5 +1,6 @@
 Django==4.2.1
-requests
+pyjwt==2.6.0
+requests==2.30.0
 djangorestframework
 markdown
 django-filter
@@ -14,7 +15,9 @@ pillow
 whoosh
 django-haystack
 jieba
+django-concurrency
 django-simpleui
+django-import-export
 gevent
 gunicorn
 sentry-sdk[django]

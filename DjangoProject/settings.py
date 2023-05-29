@@ -12,15 +12,18 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 # TODO:因为设置文件包含敏感信息，应该尽一切努力限制对它的访问。例如，更改其文件权限，以便只有您和您的 Web 服务器的用户可以读取它。
 import os
 from pathlib import Path
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
+BASE_DIR = Path(__file__).resolve().parent.parent
+
 from .config import cf
 from .simpleui import *
 from .ckeditor import *
+from .haystack import HAYSTACK_CONNECTIONS,HAYSTACK_SIGNAL_PROCESSOR,HAYSTACK_SEARCH_RESULTS_PER_PAGE
 from .rest_framework import REST_FRAMEWORK
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+
 
 # Application definition
 INSTALLED_APPS = [
@@ -108,12 +111,40 @@ if Django_ENV == "production":
             "PASSWORD": cf.get(Django_ENV, 'Django_DB_PASSWORD'),
             "HOST": cf.get(Django_ENV, 'Django_DB_HOST'),
             "PORT": cf.getint(Django_ENV, 'Django_DB_PORT'),
+            "CONN_MAX_AGE": 10,  # 持久化连接时间
         }
     }
 
     INSTALLED_APPS += [
         'gunicorn',  # 部署用
     ]
+
+    sentry_sdk.init(
+        integrations=[
+            DjangoIntegration(
+                # 如何命名出现在 Sentry 性能监控中的事务。
+                # "/myproject/myview/<foo>"如果你设置transaction_style="url".
+                # "myproject.myview"如果你设置transaction_style="endpoint".
+                # 默认值为"endpoint"。
+                transaction_style='url',
+                # 创建跨度并跟踪 Django 项目中所有中间件的性能。设置False为禁用。
+                middleware_spans=True,
+                # 在您的 Django 项目中创建跨度并跟踪所有Django 信号接收器函数的性能。设置False为禁用。
+                signals_spans=True,
+                # 创建跨度并跟踪对已配置缓存的所有读取操作的性能。跨度还包括缓存访问是命中还是未命中的信息。设置False为禁用。
+                cache_spans=True,
+            ),
+        ],
+
+        # Set traces_sample_rate to 1.0 to capture 100%
+        # of transactions for performance monitoring.
+        # We recommend adjusting this value in production.
+        traces_sample_rate=1.0,
+
+        # If you wish to associate users to errors (assuming you are using
+        # django.contrib.auth) you may enable sending PII data.
+        send_default_pii=True
+    )
 else:
     # Quick-start development settings - unsuitable for production
     # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
@@ -125,19 +156,47 @@ else:
     ALLOWED_HOSTS = ["*"]
 
     DATABASES = {
-        # "default": {
-        #     "ENGINE": "django.db.backends.sqlite3",
-        #     "NAME": BASE_DIR / "db.sqlite3",
-        # }
         "default": {
-            "ENGINE": 'django.db.backends.postgresql',
-            "NAME": cf.get(Django_ENV, 'Django_DB_NAME'),
-            "USER": cf.get(Django_ENV, 'Django_DB_USER'),
-            "PASSWORD": cf.get(Django_ENV, 'Django_DB_PASSWORD'),
-            "HOST": cf.get(Django_ENV, 'Django_DB_HOST'),
-            "PORT": cf.getint(Django_ENV, 'Django_DB_PORT'),
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
         }
     }
+
+    sentry_sdk.init(
+        dsn="https://1095ff1dac414862b53e6460ac78f9e9@o4503963655667712.ingest.sentry.io/4505242286358528",
+        debug=True,
+        environment="development",
+        integrations=[
+            DjangoIntegration(
+                # 如何命名出现在 Sentry 性能监控中的事务。
+                # "/myproject/myview/<foo>"如果你设置transaction_style="url".
+                # "myproject.myview"如果你设置transaction_style="endpoint".
+                # 默认值为"endpoint"。
+                transaction_style='url',
+                # 创建跨度并跟踪 Django 项目中所有中间件的性能。设置False为禁用。
+                middleware_spans=True,
+                # 在您的 Django 项目中创建跨度并跟踪所有Django 信号接收器函数的性能。设置False为禁用。
+                signals_spans=True,
+                # 创建跨度并跟踪对已配置缓存的所有读取操作的性能。跨度还包括缓存访问是命中还是未命中的信息。设置False为禁用。
+                cache_spans=True,
+            ),
+        ],
+
+        # Set traces_sample_rate to 1.0 to capture 100%
+        # of transactions for performance monitoring.
+        # We recommend adjusting this value in production.
+        traces_sample_rate=1.0,
+
+        # By default the SDK will try to use the SENTRY_RELEASE
+        # environment variable, or infer a git commit
+        # SHA as release, however you may want to set
+        # something more human-readable.
+        # release="myapp@1.0.0",
+
+        # If you wish to associate users to errors (assuming you are using
+        # django.contrib.auth) you may enable sending PII data.
+        send_default_pii=True
+    )
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -221,54 +280,12 @@ CACHES = {
 #     },
 # }
 
-# 错误日志管理系统
-sentry_sdk.init(
-    dsn="https://5d4f9be8c3604527af964e7cdbca733f@o4503963655667712.ingest.sentry.io/4505156966350848",
-    integrations=[
-        DjangoIntegration(
-            # 如何命名出现在 Sentry 性能监控中的事务。
-            # "/myproject/myview/<foo>"如果你设置transaction_style="url".
-            # "myproject.myview"如果你设置transaction_style="endpoint".
-            # 默认值为"endpoint"。
-            transaction_style='url',
-            # 创建跨度并跟踪 Django 项目中所有中间件的性能。设置False为禁用。
-            middleware_spans=True,
-            # 在您的 Django 项目中创建跨度并跟踪所有Django 信号接收器函数的性能。设置False为禁用。
-            signals_spans=True,
-            # 创建跨度并跟踪对已配置缓存的所有读取操作的性能。跨度还包括缓存访问是命中还是未命中的信息。设置False为禁用。
-            cache_spans=True,
-        ),
-    ],
-
-    # Set traces_sample_rate to 1.0 to capture 100%
-    # of transactions for performance monitoring.
-    # We recommend adjusting this value in production.
-    traces_sample_rate=1.0,
-
-    # If you wish to associate users to errors (assuming you are using
-    # django.contrib.auth) you may enable sending PII data.
-    send_default_pii=True
-)
-
 # 默认电子邮件地址，用于网站管理员的各种自动通信。这不包括发送到ADMINS和MANAGERS的错误信息
 DEFAULT_FROM_EMAIL = 'heyares@163.com'
 
 ADMINS = [
     ("daibeisi", "heyares@163.com"),
 ]
-
-HAYSTACK_CONNECTIONS = {
-    'default': {
-        # 指定了Django HAYSTACK要使用的搜索引擎，whoosh_backend_cn就是我们修改的文件
-        'ENGINE': 'DjangoProject.whoosh_cn_backend.WhooshEngine',
-        # 指定搜索文件存放的位置
-        'PATH': os.path.join(BASE_DIR, 'whoosh_index'),
-    },
-}
-# 指定搜索结果分页方式为每页10条记录
-HAYSTACK_SEARCH_RESULTS_PER_PAGE = 10
-# 指定实时更新索引，当有数据改变时，自动更新索引
-HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/

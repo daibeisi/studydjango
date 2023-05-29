@@ -2,17 +2,8 @@
 import json
 import datetime
 import requests
-import logging
 import threading
 from functools import wraps
-
-_logger = logging.getLogger(__name__)
-
-# 创建控制台显示的处理器，并设置 error 级别
-ch = logging.StreamHandler()
-ch.setLevel(logging.ERROR)
-# 将处理器添加到记录器上
-_logger.addHandler(ch)
 
 
 class MiniProgram(object):
@@ -37,21 +28,20 @@ class MiniProgram(object):
         url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid={appid}&secret=" \
               "{secret}".format(appid=self.appid, secret=self.secret)
         try:
-            res = requests.get(url=url)
+            res = requests.get(url=url, timeout=5)
         except Exception as exc:
-            _logger.error("{0}  {1}".format(exc, "微信auth.getAccessToken接口网络连接错误"))
+            raise RuntimeError("{0}  {1}".format(exc, "微信auth.getAccessToken接口网络连接错误"))
         else:
             res_json = res.json()
             errcode = res_json.get("errcode", 0)
             if errcode == 0:
-                expires_in = res_json.get("expires_in", 7200)
+                expires_in = res_json.get("expires_in", 7200) - 200
                 self.access_token_expires_time = datetime.datetime.now() + datetime.timedelta(seconds=expires_in)
                 self.access_token = res_json.get("access_token")
             elif errcode == -1 and num_tries > 0:
-                return self._get_access_token(num_tries - 1)
+                self._get_access_token(num_tries - 1)
             else:
-                errmsg = res_json.get("errmsg")
-                _logger.error(str(errcode) + "微信auth.getAccessToken接口获取access_token失败" + errmsg)
+                raise RuntimeError(str(errcode) + "微信auth.getAccessToken接口获取access_token失败" + errmsg)
 
     def ensure_access_token_effective(func):
         @wraps(func)
@@ -73,9 +63,9 @@ class MiniProgram(object):
         url = 'https://api.weixin.qq.com/sns/jscode2session?appid={appid}&secret={secret}&js_code={js_code}&' \
               'grant_type=authorization_code'.format(appid=self.appid, secret=self.secret, js_code=js_code)
         try:
-            res = requests.get(url=url)
+            res = requests.get(url=url, timeout=5)
         except Exception as exc:
-            _logger.error("{0}  {1}".format(exc, "微信auth.code2Session接口网络连接错误"))
+            raise RuntimeError("{0}  {1}".format(exc, "微信auth.code2Session接口网络连接错误"))
         else:
             res_json = res.json()
             errcode = res_json.get("errcode", 0)
@@ -85,7 +75,7 @@ class MiniProgram(object):
             elif errcode == -1 and num_tries > 1:
                 return self.get_user_id_info(js_code, num_tries - 1)
             else:
-                _logger.error(str(errcode) + "微信auth.code2Session接口获取openid、session_key、unionid失败")
+                raise RuntimeError(str(errcode) + "微信auth.code2Session接口获取openid、session_key、unionid失败")
 
     @ensure_access_token_effective
     def get_phone_info(self, code, num_tries=3):
@@ -94,9 +84,9 @@ class MiniProgram(object):
         headers = {'Content-Type': 'application/json', "Accept": "application/json"}
         data = {"code": code}
         try:
-            res = requests.post(url=url, data=json.dumps(data), headers=headers)
+            res = requests.post(url=url, data=json.dumps(data), headers=headers, timeout=5)
         except Exception as exc:
-            _logger.error("{0}  {1}".format(exc, "微信phonenumber.getPhoneNumber接口网络连接错误"))
+            raise RuntimeError("{0}  {1}".format(exc, "微信phonenumber.getPhoneNumber接口网络连接错误"))
         else:
             res_json = res.json()
             errcode = res_json.get("errcode", 0)
@@ -106,7 +96,7 @@ class MiniProgram(object):
             elif errcode == -1 and num_tries > 1:
                 return self.get_phone_number(code, num_tries - 1)
             else:
-                _logger.error(str(errcode) + "微信phonenumber.getPhoneNumber接口获取phone_number失败")
+                raise RuntimeError(str(errcode) + "微信phonenumber.getPhoneNumber接口获取phone_number失败")
 
 
 if __name__ == '__main__':
