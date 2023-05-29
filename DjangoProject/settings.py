@@ -18,7 +18,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 from .config import cf
 from .simpleui import *
 from .ckeditor import *
-from .haystack import HAYSTACK_CONNECTIONS,HAYSTACK_SIGNAL_PROCESSOR,HAYSTACK_SEARCH_RESULTS_PER_PAGE
+from .haystack import HAYSTACK_CONNECTIONS, HAYSTACK_SIGNAL_PROCESSOR,HAYSTACK_SEARCH_RESULTS_PER_PAGE
 from .rest_framework import REST_FRAMEWORK
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
@@ -36,10 +36,11 @@ INSTALLED_APPS = [
     "django.contrib.messages",  # 消息框架
     "django.contrib.staticfiles",  # 管理静态文件的框架
     # 第三方应用
-    'ckeditor',
-    'ckeditor_uploader',
-    'haystack',
-    'rest_framework',
+    "ckeditor",
+    "ckeditor_uploader",
+    "haystack",
+    "rest_framework",
+    "rest_framework_simplejwt",
     # 自定义应用
     "Apps.base"
 ]
@@ -162,41 +163,43 @@ else:
         }
     }
 
-    sentry_sdk.init(
-        dsn="https://1095ff1dac414862b53e6460ac78f9e9@o4503963655667712.ingest.sentry.io/4505242286358528",
-        debug=True,
-        environment="development",
-        integrations=[
-            DjangoIntegration(
-                # 如何命名出现在 Sentry 性能监控中的事务。
-                # "/myproject/myview/<foo>"如果你设置transaction_style="url".
-                # "myproject.myview"如果你设置transaction_style="endpoint".
-                # 默认值为"endpoint"。
-                transaction_style='url',
-                # 创建跨度并跟踪 Django 项目中所有中间件的性能。设置False为禁用。
-                middleware_spans=True,
-                # 在您的 Django 项目中创建跨度并跟踪所有Django 信号接收器函数的性能。设置False为禁用。
-                signals_spans=True,
-                # 创建跨度并跟踪对已配置缓存的所有读取操作的性能。跨度还包括缓存访问是命中还是未命中的信息。设置False为禁用。
-                cache_spans=True,
-            ),
-        ],
+    # sentry_sdk.init(
+    #     dsn="https://1095ff1dac414862b53e6460ac78f9e9@o4503963655667712.ingest.sentry.io/4505242286358528",
+    #     debug=True,
+    #     environment="development",
+    #     integrations=[
+    #         DjangoIntegration(
+    #             # 如何命名出现在 Sentry 性能监控中的事务。
+    #             # "/myproject/myview/<foo>"如果你设置transaction_style="url".
+    #             # "myproject.myview"如果你设置transaction_style="endpoint".
+    #             # 默认值为"endpoint"。
+    #             transaction_style='url',
+    #             # 创建跨度并跟踪 Django 项目中所有中间件的性能。设置False为禁用。
+    #             middleware_spans=True,
+    #             # 在您的 Django 项目中创建跨度并跟踪所有Django 信号接收器函数的性能。设置False为禁用。
+    #             signals_spans=True,
+    #             # 创建跨度并跟踪对已配置缓存的所有读取操作的性能。跨度还包括缓存访问是命中还是未命中的信息。设置False为禁用。
+    #             cache_spans=True,
+    #         ),
+    #     ],
+    #
+    #     # Set traces_sample_rate to 1.0 to capture 100%
+    #     # of transactions for performance monitoring.
+    #     # We recommend adjusting this value in production.
+    #     traces_sample_rate=1.0,
+    #
+    #     # By default the SDK will try to use the SENTRY_RELEASE
+    #     # environment variable, or infer a git commit
+    #     # SHA as release, however you may want to set
+    #     # something more human-readable.
+    #     # release="myapp@1.0.0",
+    #
+    #     # If you wish to associate users to errors (assuming you are using
+    #     # django.contrib.auth) you may enable sending PII data.
+    #     send_default_pii=True
+    # )
 
-        # Set traces_sample_rate to 1.0 to capture 100%
-        # of transactions for performance monitoring.
-        # We recommend adjusting this value in production.
-        traces_sample_rate=1.0,
-
-        # By default the SDK will try to use the SENTRY_RELEASE
-        # environment variable, or infer a git commit
-        # SHA as release, however you may want to set
-        # something more human-readable.
-        # release="myapp@1.0.0",
-
-        # If you wish to associate users to errors (assuming you are using
-        # django.contrib.auth) you may enable sending PII data.
-        send_default_pii=True
-    )
+from .simplejwt import SIMPLE_JWT
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators

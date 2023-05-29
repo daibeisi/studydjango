@@ -11,10 +11,10 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 20,
     # 身份认证后端——如果有多个认证，则有一个认证通过就算认证成功
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.BasicAuthentication',  # 基本认证 —— 请求的时候传递用户名和密码，进行身份认证
+        # 'rest_framework.authentication.BasicAuthentication',  # 基本认证 —— 请求的时候传递用户名和密码，进行身份认证
         # 在drf视图(APIView)处理一个请求的过程中，会提取cookie中的sessionid，并在缓存中获取用户数据
-        'rest_framework.authentication.SessionAuthentication',  # session认证
-        "rest_framework.authentication.TokenAuthentication",  # Token认证
+        # 'rest_framework.authentication.SessionAuthentication',  # session认证
+        # "rest_framework.authentication.TokenAuthentication",  # Token认证
         'rest_framework_simplejwt.authentication.JWTAuthentication',  # JWT认证
     ),
     # 权限认证后端,有多个权限后端，遵循最严格的
@@ -22,7 +22,7 @@ REST_FRAMEWORK = {
         # 'rest_framework.permissions.IsAuthenticated', # 只有经过身份认证确定用户身份才能访问
         # 'rest_framework.permissions.IsAdminUser', # is_staff=True才能访问 —— 管理员(员工)权限
         # 'rest_framework.permissions.AllowAny',  # 允许所有
-        'rest_framework.permissions.IsAuthenticatedOrReadOnly', # 有身份 或者 只读访问(self.list,self.retrieve)
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',  # 有身份 或者 只读访问(self.list,self.retrieve)
     ),
     # 流量限制后端
     'DEFAULT_THROTTLE_CLASSES': (
