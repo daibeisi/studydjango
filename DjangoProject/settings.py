@@ -102,6 +102,7 @@ if Django_ENV == "production":
 
     # 该配置避免你的站点遭受某些 CSRF 攻击。如果使用了通配符，你必须实现自定义的 Host HTTP 头，或者确保你不会很容易地遭受此种攻击。
     ALLOWED_HOSTS = [".bookhub.com.cn"]
+    CSRF_TRUSTED_ORIGINS = ["https://test.bookhub.com.cn"]
 
     # Database
     # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
