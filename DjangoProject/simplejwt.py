@@ -9,7 +9,7 @@ Django_ENV = os.environ.get('Django_ENV', "development")
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(hours=2),  # 访问令牌有效时间
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),  # 刷新令牌有效时间
-    "ROTATE_REFRESH_TOKENS": False,  # 若为True，刷新时refresh_token也会刷新
+    "ROTATE_REFRESH_TOKENS": True,  # 若为True，刷新时refresh_token也会刷新
     "BLACKLIST_AFTER_ROTATION": True,  # 若为True，刷新后的token将添加到黑名单中
     "UPDATE_LAST_LOGIN": False,  # 是否更新auth_user 表中的 last_login 字段
     "ALGORITHM": "HS256",  # 加密算法
@@ -28,8 +28,10 @@ SIMPLE_JWT = {
     # 确定用户是否被允许进行认证规则
     "USER_AUTHENTICATION_RULE": "rest_framework_simplejwt.authentication.default_user_authentication_rule",
 
-    # 指明允许用来证明认证的令牌类型的类的点状路径列表。更多信息见下面的 "令牌类型 "部分。
-    "AUTH_TOKEN_CLASSES": ("rest_framework_simplejwt.tokens.AccessToken",),
+    "AUTH_TOKEN_CLASSES": (
+        "rest_framework_simplejwt.tokens.AccessToken",
+        # "rest_framework_simplejwt.tokens.SlidingToken"
+    ),  # 允许用来证明认证的令牌类型
     "TOKEN_TYPE_CLAIM": "token_type",  # 存储令牌类型的名称
 
     # 一个无状态的用户对象，由一个经过验证的令牌支持。仅用于JWTStatelessUserAuthentication认证后端。
@@ -41,7 +43,7 @@ SIMPLE_JWT = {
     "SLIDING_TOKEN_LIFETIME": timedelta(minutes=5),  # 滑动令牌的有效时间
     "SLIDING_TOKEN_REFRESH_LIFETIME": timedelta(days=1),  # 指定了可以刷新滑动令牌的有效时间
 
-    "TOKEN_OBTAIN_SERIALIZER": "Apps.base.serializers.DIYTokenObtainSerializer",
+    "TOKEN_OBTAIN_SERIALIZER": "rest_framework_simplejwt.serializers.TokenObtainPairSerializer",
     "TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSerializer",
     "TOKEN_VERIFY_SERIALIZER": "rest_framework_simplejwt.serializers.TokenVerifySerializer",
     "TOKEN_BLACKLIST_SERIALIZER": "rest_framework_simplejwt.serializers.TokenBlacklistSerializer",
