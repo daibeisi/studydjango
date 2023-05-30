@@ -102,7 +102,6 @@ if Django_ENV == "production":
 
     # 该配置避免你的站点遭受某些 CSRF 攻击。如果使用了通配符，你必须实现自定义的 Host HTTP 头，或者确保你不会很容易地遭受此种攻击。
     ALLOWED_HOSTS = [".bookhub.com.cn"]
-    CSRF_TRUSTED_ORIGINS = ["https://test.bookhub.com.cn"]
 
     # Database
     # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
@@ -241,7 +240,7 @@ CSRF_COOKIE_SECURE = False  # 是否为 CSRF cookie 使用安全 cookie
 CSRF_USE_SESSIONS = False  # 是否将 CSRF 标记存储在用户的会话中，而不是 cookie 中
 CSRF_FAILURE_VIEW = 'django.views.csrf.csrf_failure'  # 当传入的请求被 CSRF 保护 拒绝时，要使用的视图函数的点分隔路径
 CSRF_HEADER_NAME = 'HTTP_X_CSRFTOKEN'  # 用于 CSRF 认证的请求头的名称。
-CSRF_TRUSTED_ORIGINS = []  # 不安全请求的可信来源列表
+CSRF_TRUSTED_ORIGINS = ["https://test.bookhub.com.cn"]  # 不安全请求的可信来源列表
 
 # 缓存设置,执行创建表命令python manage.py createcachetable
 CACHES = {
