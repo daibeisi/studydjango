@@ -11,10 +11,6 @@ services:
       - POSTGRES_DB=django
       - POSTGRES_USER=django
       - POSTGRES_PASSWORD=django
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "1g"
   backend:
     build: .
     restart: always
@@ -35,10 +31,6 @@ services:
       - ./requirements.txt:/home/django/workspace/requirements.txt
     depends_on:
       - db
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "1g"
   nginx:
     image: nginx
     restart: always
@@ -54,7 +46,3 @@ services:
       - ./nginx/log:/var/log/nginx
     depends_on:
       - backend
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "1g"
