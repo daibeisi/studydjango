@@ -36,9 +36,9 @@ admin.site.site_title = "Django管理系统"
 # admin.site.index_title = '我在浏览器标签前面'
 
 urlpatterns = [
-    path('api/base/', include('Apps.base.urls', namespace='base')),
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('api/base/', include('Apps.base.urls', namespace='base')),
     # path('api/sliding-token/', TokenObtainSlidingView.as_view(), name='token_obtain_pair'),
     # path('api/sliding-token/refresh/', TokenRefreshSlidingView.as_view(), name='token_refresh'),
     path('api/token/blacklist/', TokenBlacklistView.as_view(), name='token_blacklist'),

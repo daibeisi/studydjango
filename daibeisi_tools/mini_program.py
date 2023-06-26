@@ -6,7 +6,9 @@ import threading
 from functools import wraps
 
 
-class MiniProgram(object):
+class MiniProgram:
+    """小程序接口
+    """
     _instance = None
     _lock = threading.RLock()
 
@@ -30,7 +32,7 @@ class MiniProgram(object):
         try:
             res = requests.get(url=url, timeout=5)
         except Exception as exc:
-            raise RuntimeError("{0}  {1}".format(exc, "微信auth.getAccessToken接口网络连接错误"))
+            raise RuntimeError("微信auth.getAccessToken接口网络连接错误") from exc
         else:
             res_json = res.json()
             errcode = res_json.get("errcode", 0)
@@ -41,7 +43,8 @@ class MiniProgram(object):
             elif errcode == -1 and num_tries > 0:
                 self._get_access_token(num_tries - 1)
             else:
-                raise RuntimeError(str(errcode) + "微信auth.getAccessToken接口获取access_token失败" + errmsg)
+                errmsg = res_json.get("errmsg")
+                raise RuntimeError(f"微信auth.getAccessToken接口获取access_token失败{errcode}{errmsg}")
 
     def ensure_access_token_effective(func):
         @wraps(func)
@@ -65,7 +68,7 @@ class MiniProgram(object):
         try:
             res = requests.get(url=url, timeout=5)
         except Exception as exc:
-            raise RuntimeError("{0}  {1}".format(exc, "微信auth.code2Session接口网络连接错误"))
+            raise RuntimeError("微信auth.code2Session接口网络连接错误") from exc
         else:
             res_json = res.json()
             errcode = res_json.get("errcode", 0)
@@ -75,7 +78,8 @@ class MiniProgram(object):
             elif errcode == -1 and num_tries > 1:
                 return self.get_user_id_info(js_code, num_tries - 1)
             else:
-                raise RuntimeError(str(errcode) + "微信auth.code2Session接口获取openid、session_key、unionid失败")
+                errmsg = res_json.get("errmsg")
+                raise RuntimeError(f"微信auth.code2Session接口获取openid、session_key、unionid失败{errcode}{errmsg}")
 
     @ensure_access_token_effective
     def get_phone_info(self, code, num_tries=3):
@@ -86,7 +90,7 @@ class MiniProgram(object):
         try:
             res = requests.post(url=url, data=json.dumps(data), headers=headers, timeout=5)
         except Exception as exc:
-            raise RuntimeError("{0}  {1}".format(exc, "微信phonenumber.getPhoneNumber接口网络连接错误"))
+            raise RuntimeError("微信phonenumber.getPhoneNumber接口网络连接错误") from exc
         else:
             res_json = res.json()
             errcode = res_json.get("errcode", 0)
@@ -96,7 +100,8 @@ class MiniProgram(object):
             elif errcode == -1 and num_tries > 1:
                 return self.get_phone_number(code, num_tries - 1)
             else:
-                raise RuntimeError(str(errcode) + "微信phonenumber.getPhoneNumber接口获取phone_number失败")
+                errmsg = res_json.get("errmsg")
+                raise RuntimeError(f"微信phonenumber.getPhoneNumber接口获取phone_number失败{errcode}{errmsg}")
 
 
 if __name__ == '__main__':
