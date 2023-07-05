@@ -26,7 +26,7 @@ class MiniProgram:
                 cls._instance = super().__new__(cls)
             return cls._instance
 
-    def _get_access_token(self, num_tries=3):
+    def _get_access_token(self):
         url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid={appid}&secret=" \
               "{secret}".format(appid=self.appid, secret=self.secret)
         try:
@@ -40,8 +40,6 @@ class MiniProgram:
                 expires_in = res_json.get("expires_in", 7200) - 200
                 self.access_token_expires_time = datetime.datetime.now() + datetime.timedelta(seconds=expires_in)
                 self.access_token = res_json.get("access_token")
-            elif errcode == -1 and num_tries > 0:
-                self._get_access_token(num_tries - 1)
             else:
                 errmsg = res_json.get("errmsg")
                 raise RuntimeError(f"微信auth.getAccessToken接口获取access_token失败{errcode}{errmsg}")
@@ -56,7 +54,7 @@ class MiniProgram:
 
         return wrapper
 
-    def get_user_id_info(self, js_code, num_tries=3):
+    def get_user_id_info(self, js_code):
         """获取用户openid、session_key、unionid
 
         :param str js_code: 通过 wx.login 接口获得临时登录凭证 code
@@ -75,14 +73,12 @@ class MiniProgram:
             if errcode == 0:
                 user_id_info = res_json
                 return user_id_info
-            elif errcode == -1 and num_tries > 1:
-                return self.get_user_id_info(js_code, num_tries - 1)
             else:
                 errmsg = res_json.get("errmsg")
                 raise RuntimeError(f"微信auth.code2Session接口获取openid、session_key、unionid失败{errcode}{errmsg}")
 
     @ensure_access_token_effective
-    def get_phone_info(self, code, num_tries=3):
+    def get_phone_info(self, code):
         url = "https://api.weixin.qq.com/wxa/business/getuserphonenumber" \
               "?access_token={0}".format(self.access_token)
         headers = {'Content-Type': 'application/json', "Accept": "application/json"}
@@ -97,8 +93,6 @@ class MiniProgram:
             if errcode == 0:
                 phone_info = res_json.get("phone_info")
                 return phone_info
-            elif errcode == -1 and num_tries > 1:
-                return self.get_phone_number(code, num_tries - 1)
             else:
                 errmsg = res_json.get("errmsg")
                 raise RuntimeError(f"微信phonenumber.getPhoneNumber接口获取phone_number失败{errcode}{errmsg}")
