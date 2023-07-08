@@ -37,5 +37,9 @@ USER django
 RUN mkdir -p /home/django/workspace
 WORKDIR /home/django/workspace
 COPY . .
-RUN chmod x entrypoint.sh
+
+USER root
+RUN chmod 777 entrypoint.sh
+
+USER django
 CMD ["entrypoint.sh"]
