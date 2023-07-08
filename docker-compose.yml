@@ -16,7 +16,6 @@ services:
     restart: always
     environment:
       - Django_ENV=production
-      - SENTRY_DSN=https://5d4f9be8c3604527af964e7cdbca733f@o4503963655667712.ingest.sentry.io/4505156966350848
     volumes:
       - ./Apps/:/home/django/workspace/Apps/
       - ./daibeisi_tools/:/home/django/workspace/daibeisi_tools/

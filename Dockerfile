@@ -37,14 +37,5 @@ USER django
 RUN mkdir -p /home/django/workspace
 WORKDIR /home/django/workspace
 COPY . .
-
-# make sure all messages always reach console
-ENV PYTHONUNBUFFERED=1
-
-# activate virtual environment
-ENV VIRTUAL_ENV=/home/django/venv
-ENV PATH="/home/django/venv/bin:$PATH"
-
-# /dev/shm is mapped to shared memory and should be used for gunicorn heartbeat
-# this will improve performance and avoid random freezes
-CMD ["gunicorn","-c", "gunicorn.conf.py", "--worker-tmp-dir", "/dev/shm", "DjangoProject.wsgi:application"]
+RUN chmod u+x entrypoint.sh
+CMD ["entrypoint.sh"]

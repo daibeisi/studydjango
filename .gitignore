@@ -140,7 +140,7 @@ cython_debug/
 .idea
 .vscode
 
-
+DjangoProject.conf
 
 migrations/
 !migrations/__init__.py

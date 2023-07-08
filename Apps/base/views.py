@@ -1,5 +1,6 @@
 from django.shortcuts import render, HttpResponseRedirect
 from django.contrib.auth import authenticate, login
+from django.db import transaction
 from django.conf.global_settings import LOGIN_URL
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import make_password, check_password
@@ -53,13 +54,14 @@ class WeixinLogin(APIView):
         js_code = json.loads(request.body).get('js_code')
         user_id_info = mp.get_user_id_info(js_code)
         openid = user_id_info.get("openid")
-        user_info = UserInfo.objects.filter(openid=openid).first()
-        if user_info:
-            user = UserInfo.user
-        else:
-            user = User.objects.create(username=time.time(), password=make_password(time.time()))
-            user.userinfo.openid = openid
-            user.userinfo.save()
+        with transaction.atomic():
+            user_info = UserInfo.objects.filter(openid=openid).first()
+            if user_info:
+                user = UserInfo.user
+            else:
+                user = User.objects.create(username=time.time(), password=make_password(time.time()))
+                user.userinfo.openid = openid
+                user.userinfo.save()
         refresh = RefreshToken.for_user(user)
         return Response({
                 "code": 0,

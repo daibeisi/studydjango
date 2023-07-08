@@ -1,6 +1,5 @@
-Django==4.2.1
-pyjwt==2.6.0
-requests==2.30.0
+Django==4.2.3
+requests
 djangorestframework
 markdown
 django-filter
