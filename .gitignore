@@ -144,7 +144,7 @@ DjangoProject.conf
 
 migrations/
 !migrations/__init__.py
-
+nginx/cert/
 file/
 whoosh_index/
 django_project_log/
