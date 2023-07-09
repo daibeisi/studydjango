@@ -41,5 +41,5 @@ COPY . .
 USER root
 RUN chmod 777 entrypoint.sh
 
-USER django
+#USER django
 CMD ["entrypoint.sh"]
