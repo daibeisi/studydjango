@@ -42,4 +42,4 @@ USER root
 RUN chmod 777 entrypoint.sh
 
 #USER django
-CMD ["entrypoint.sh"]
+CMD ["bash", "-c", "./entrypoint.sh"]
