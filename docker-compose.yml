@@ -21,6 +21,7 @@ services:
       - ./daibeisi_tools/:/home/django/workspace/daibeisi_tools/
       - ./DjangoProject/:/home/django/workspace/DjangoProject/
       - ./file/:/home/django/workspace/file/
+      - ./logs/:/home/django/workspace/logs/
       - ./middlewares/:/home/django/workspace/middlewares/
       - ./static/:/home/django/workspace/static/
       - ./templates/:/home/django/workspace/templates/
