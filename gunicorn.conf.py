@@ -5,8 +5,7 @@ wsgi_app = 'DjangoProject.wsgi:application'  # 模式中的 WSGI 应用程序路
 
 # 日志
 accesslog = "-"  # 访问日志文件，"-" 表示标准输出
-access_log_format = '%(t)s %({x-real-ip}i)s %(l)s %(h)s %(l)s %(u)s %(l)s %(p)s "%(r)s" %(s)s %(L)s %(b)s "%(f)s" "%(' \
-                    'a)s"'
+access_log_format = '%(t)s%({x-real-ip}i)s%(l)s%(h)s %(p)s "%(r)s" %(s)s %(L)s %(b)s "%(f)s" "%(a)s"'
 errorlog = "/home/django/workspace/logs/gunicorn_error.log"  # 错误日志文件
 loglevel = 'info'  # 日志级别，这个日志级别指的是错误日志的级别，而访问日志的级别无法设置
 
