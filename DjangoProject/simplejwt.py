@@ -7,7 +7,7 @@ Django_ENV = os.environ.get('Django_ENV', "development")
 
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(hours=2),  # 访问令牌有效时间
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=10),  # 访问令牌有效时间
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),  # 刷新令牌有效时间
     "ROTATE_REFRESH_TOKENS": True,  # 若为True，刷新时refresh_token也会刷新
     "BLACKLIST_AFTER_ROTATION": True,  # 若为True，刷新后的token将添加到黑名单中
@@ -43,7 +43,7 @@ SIMPLE_JWT = {
     "SLIDING_TOKEN_LIFETIME": timedelta(minutes=5),  # 滑动令牌的有效时间
     "SLIDING_TOKEN_REFRESH_LIFETIME": timedelta(days=1),  # 指定了可以刷新滑动令牌的有效时间
 
-    "TOKEN_OBTAIN_SERIALIZER": "rest_framework_simplejwt.serializers.TokenObtainPairSerializer",
+    "TOKEN_OBTAIN_SERIALIZER": "Apps.base.serializers.MyTokenObtainPairSerializer",
     "TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSerializer",
     "TOKEN_VERIFY_SERIALIZER": "rest_framework_simplejwt.serializers.TokenVerifySerializer",
     "TOKEN_BLACKLIST_SERIALIZER": "rest_framework_simplejwt.serializers.TokenBlacklistSerializer",

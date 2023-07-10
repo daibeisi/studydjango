@@ -28,7 +28,7 @@ class RegisterView(APIView):
         if User.objects.filter(username=username).exists():
             return Response({"code": -1, "message": "用户已存在！"})
         User.objects.create(username=username, password=make_password(password))
-        return Response({"code": 0, "message": "用户创建成功！"})
+        return Response({"code": 0, "message": "用户创建成功！", "data": {"username": username, "password": password}})
 
 
 class LoginView(APIView):
@@ -49,18 +49,33 @@ class LoginView(APIView):
         return Response({"code": 0, "msg": "登陆成功"})
 
 
+class LogoutView(APIView):
+    def get(self, request):
+        request.session.flush()
+        return HttpResponseRedirect(LOGIN_URL)
+
+    def post(self, request):
+        request.session.flush()
+        return Response({"code": 0, "msg": "登出成功"})
+
+
 class WeixinLogin(APIView):
     def post(self, request, format=None):
         js_code = json.loads(request.body).get('js_code')
         user_id_info = mp.get_user_id_info(js_code)
         openid = user_id_info.get("openid")
+        unionid = user_id_info.get("unionid")
         with transaction.atomic():
-            user_info = UserInfo.objects.filter(openid=openid).first()
+            if openid:
+                user_info = UserInfo.objects.filter(openid=openid).first()
+            else:
+                user_info = UserInfo.objects.filter(unionid=unionid).first()
             if user_info:
                 user = UserInfo.user
             else:
                 user = User.objects.create(username=time.time(), password=make_password(time.time()))
                 user.userinfo.openid = openid
+                user.userinfo.unionid = unionid
                 user.userinfo.save()
         refresh = RefreshToken.for_user(user)
         return Response({
@@ -71,13 +86,3 @@ class WeixinLogin(APIView):
                     'access_token': str(refresh.access_token)
                 }
             })
-
-
-class LogoutView(APIView):
-    def get(self, request):
-        request.session.flush()
-        return HttpResponseRedirect(LOGIN_URL)
-
-    def post(self, request):
-        request.session.flush()
-        return Response({"code": 0, "msg": "登出成功"})

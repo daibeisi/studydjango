@@ -15,9 +15,11 @@ Getting started with DjangoProject
 解决方案
 -------------------------
 # 导入导出
-  django-import-export
+  django-import-export-celery
 # restapi
   djangorestframework
+# token认证
+  djangorestframework-simplejwt
 # 文件存储
   自定义文件存储系统，保存至阿里云OSS
 # 后台样式
