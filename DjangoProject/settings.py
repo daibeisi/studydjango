@@ -25,7 +25,6 @@ import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
 
 
-
 # Application definition
 INSTALLED_APPS = [
     "simpleui",
@@ -118,6 +117,14 @@ if Django_ENV == "production":
         }
     }
 
+    STORAGES = {
+        "default": {
+            "BACKEND": "DjangoProject.django_oss_storage.OssStaticStorage"
+        },
+        "staticfiles": {
+            "BACKEND": "DjangoProject.django_oss_storage.OssMediaStorage"
+        },
+    }
     INSTALLED_APPS += [
         'gunicorn',  # 部署用
     ]
@@ -306,8 +313,8 @@ USE_TZ = False  # 指定是否使用指定的时区(TIME_ZONE)的时间
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 # 静态文件设置,执行创建表命令python manage.py collectstatic
-STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "file/static")
+STATIC_URL = "/static/"
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static")
 ]

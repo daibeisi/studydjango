@@ -19,4 +19,5 @@ django-simpleui
 django-import-export
 gevent
 gunicorn
+oss2
 sentry-sdk[django]
