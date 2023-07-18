@@ -38,8 +38,9 @@ RUN mkdir -p /home/django/workspace
 WORKDIR /home/django/workspace
 COPY . .
 
-USER root
-RUN chmod 777 entrypoint.sh
+ENV PYTHONUNBUFFERED=1
+ENV VIRTUAL_ENV=/home/django/venv
+ENV PATH="/home/django/venv/bin:$PATH"
 
 #USER django
 CMD ["bash", "-c", "./entrypoint.sh"]

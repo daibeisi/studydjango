@@ -1,10 +1,4 @@
 #!/bin/bash
-
-
-export PYTHONUNBUFFERED=1
-export VIRTUAL_ENV=/home/django/venv
-export PATH="/home/django/venv/bin:$PATH"
-
 export OSS_ACCESS_KEY_ID=""
 export OSS_ACCESS_KEY_SECRET=""
 export OSS_BUCKET_NAME=""
