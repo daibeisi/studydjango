@@ -32,16 +32,14 @@ RUN apt-get update  \
 
 RUN useradd --create-home django
 COPY --from=builder-image /home/django/venv /home/django/venv
+ENV PYTHONUNBUFFERED=1
+ENV VIRTUAL_ENV=/home/django/venv
+ENV PATH="/home/django/venv/bin:$PATH"
 
 USER django
 RUN mkdir -p /home/django/workspace
 WORKDIR /home/django/workspace
 COPY . .
-RUN chmod 777 ./entrypoint.sh
-
-ENV PYTHONUNBUFFERED=1
-ENV VIRTUAL_ENV=/home/django/venv
-ENV PATH="/home/django/venv/bin:$PATH"
 
 #USER django
-CMD ["bash", "-c", "./entrypoint.sh"]
+CMD ["gunicorn", "-c", "gunicorn.conf.py"]
