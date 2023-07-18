@@ -30,7 +30,8 @@ Getting started with DjangoProject
   django-ckeditor
 # 自动报告错误和异常以及性能监控
   sentry
-
+# 静态文件压缩
+  django-compressor
 + 接口安全
   1. 请求身份是否合法？
   2. 请求参数是否篡改？

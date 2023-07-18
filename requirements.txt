@@ -20,4 +20,6 @@ django-import-export
 gevent
 gunicorn
 oss2
+wechatpayv3
+django-compressor
 sentry-sdk[django]
