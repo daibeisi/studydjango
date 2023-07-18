@@ -10,7 +10,11 @@ Getting started with DjangoProject
   1. pip install -r requirements.txt
   2. python manage.py runserver 0:8000
 + PROD
-  1. sudo docker-compose up -d --build
+  1. git clone git@github.com:daibeisi/studydjango.git
+  2. 将ssl证书放到 nginx/cert 目录下
+  3. 修改 DjangoProject.conf 配置文件中配置
+  4. docker-compose up -d --build
+  5. 进入backend容器执行 python manage.py collectstatic && python manage.py createsuperuser
 
 解决方案
 -------------------------

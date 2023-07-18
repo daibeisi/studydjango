@@ -12,18 +12,18 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 # TODO:因为设置文件包含敏感信息，应该尽一切努力限制对它的访问。例如，更改其文件权限，以便只有您和您的 Web 服务器的用户可以读取它。
 import os
 from pathlib import Path
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 from .config import cf
 from .simpleui import *
 from .ckeditor import *
-from .haystack import HAYSTACK_CONNECTIONS, HAYSTACK_SIGNAL_PROCESSOR,HAYSTACK_SEARCH_RESULTS_PER_PAGE
+from .haystack import HAYSTACK_CONNECTIONS, HAYSTACK_SIGNAL_PROCESSOR, HAYSTACK_SEARCH_RESULTS_PER_PAGE
 from .rest_framework import REST_FRAMEWORK
 from .simplejwt import SIMPLE_JWT
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
-
 
 # Application definition
 INSTALLED_APPS = [
@@ -87,7 +87,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "DjangoProject.wsgi.application"
-
 Django_ENV = os.environ.get('Django_ENV', "development")
 
 # Quick-start development settings - unsuitable for production
@@ -95,16 +94,12 @@ Django_ENV = os.environ.get('Django_ENV', "development")
 if Django_ENV == "production":
     # SECURITY WARNING: don't run with debug turned on in production!
     DEBUG = False
-
     # SECURITY WARNING: keep the secret key used in production secret!
     SECRET_KEY = cf.get(Django_ENV, 'Django_SECRET_KEY')
-
     # 该配置避免你的站点遭受某些 CSRF 攻击。如果使用了通配符，你必须实现自定义的 Host HTTP 头，或者确保你不会很容易地遭受此种攻击。
     ALLOWED_HOSTS = [".bookhub.com.cn"]
-
     # Database
     # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-
     DATABASES = {
         "default": {
             "ENGINE": 'django.db.backends.postgresql',
@@ -116,7 +111,14 @@ if Django_ENV == "production":
             "CONN_MAX_AGE": 10,  # 持久化连接时间
         }
     }
-
+    INSTALLED_APPS += [
+        'gunicorn',  # 部署用
+    ]
+    OSS_ACCESS_KEY_ID = cf.get(Django_ENV, 'OSS_ACCESS_KEY_ID'),
+    OSS_ACCESS_KEY_SECRET = cf.get(Django_ENV, 'OSS_ACCESS_KEY_SECRET'),
+    OSS_BUCKET_NAME = cf.get(Django_ENV, 'OSS_BUCKET_NAME'),
+    OSS_ENDPOINT = cf.get(Django_ENV, 'OSS_ENDPOINT'),
+    OSS_EXPIRE_TIME = cf.getint(Django_ENV, 'OSS_EXPIRE_TIME'),
     STORAGES = {
         "default": {
             "BACKEND": "DjangoProject.django_oss_storage.OssStaticStorage"
@@ -125,17 +127,12 @@ if Django_ENV == "production":
             "BACKEND": "DjangoProject.django_oss_storage.OssMediaStorage"
         },
     }
-    INSTALLED_APPS += [
-        'gunicorn',  # 部署用
-    ]
-
     sentry_sdk.init(
+        dsn=cf.get(Django_ENV, 'SENTRY_DSN'),
+        environment=cf.get(Django_ENV, 'SENTRY_ENVIRONMENT'),
         integrations=[
             DjangoIntegration(
                 # 如何命名出现在 Sentry 性能监控中的事务。
-                # "/myproject/myview/<foo>"如果你设置transaction_style="url".
-                # "myproject.myview"如果你设置transaction_style="endpoint".
-                # 默认值为"endpoint"。
                 transaction_style='url',
                 # 创建跨度并跟踪 Django 项目中所有中间件的性能。设置False为禁用。
                 middleware_spans=True,
@@ -145,42 +142,27 @@ if Django_ENV == "production":
                 cache_spans=True,
             ),
         ],
-
-        # Set traces_sample_rate to 1.0 to capture 100%
-        # of transactions for performance monitoring.
-        # We recommend adjusting this value in production.
         traces_sample_rate=1.0,
-
-        # If you wish to associate users to errors (assuming you are using
-        # django.contrib.auth) you may enable sending PII data.
         send_default_pii=True
     )
 else:
     # Quick-start development settings - unsuitable for production
     # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
-
     DEBUG = True
-
     SECRET_KEY = cf.get(Django_ENV, 'Django_SECRET_KEY')
-
     ALLOWED_HOSTS = ["*"]
-
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
             "NAME": BASE_DIR / "db.sqlite3",
         }
     }
-
     sentry_sdk.init(
-        dsn="https://1095ff1dac414862b53e6460ac78f9e9@o4503963655667712.ingest.sentry.io/4505242286358528",
-        environment="development",
+        dsn=cf.get(Django_ENV, 'SENTRY_DSN'),
+        environment=cf.get(Django_ENV, 'SENTRY_ENVIRONMENT'),
         integrations=[
             DjangoIntegration(
                 # 如何命名出现在 Sentry 性能监控中的事务。
-                # "/myproject/myview/<foo>"如果你设置transaction_style="url".
-                # "myproject.myview"如果你设置transaction_style="endpoint".
-                # 默认值为"endpoint"。
                 transaction_style='url',
                 # 创建跨度并跟踪 Django 项目中所有中间件的性能。设置False为禁用。
                 middleware_spans=True,
@@ -190,20 +172,7 @@ else:
                 cache_spans=True,
             ),
         ],
-
-        # Set traces_sample_rate to 1.0 to capture 100%
-        # of transactions for performance monitoring.
-        # We recommend adjusting this value in production.
         traces_sample_rate=1.0,
-
-        # By default the SDK will try to use the SENTRY_RELEASE
-        # environment variable, or infer a git commit
-        # SHA as release, however you may want to set
-        # something more human-readable.
-        # release="myapp@1.0.0",
-
-        # If you wish to associate users to errors (assuming you are using
-        # django.contrib.auth) you may enable sending PII data.
         send_default_pii=True
     )
 
@@ -222,7 +191,6 @@ AUTH_PASSWORD_VALIDATORS = [
 # 登陆url和登陆后跳转url
 LOGIN_URL = '/api-auth/login/'
 LOGIN_REDIRECT_URL = '/api-auth/api-router/'
-
 
 # session设置
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # 引擎（默认）

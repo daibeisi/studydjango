@@ -23,8 +23,8 @@ from DjangoProject.rest_framework import router
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
-    TokenObtainSlidingView,
-    TokenRefreshSlidingView,
+    # TokenObtainSlidingView,
+    # TokenRefreshSlidingView,
     TokenBlacklistView,
     TokenVerifyView
 )
