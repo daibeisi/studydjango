@@ -37,6 +37,7 @@ USER django
 RUN mkdir -p /home/django/workspace
 WORKDIR /home/django/workspace
 COPY . .
+RUN chmod +x entrypoint.sh
 
 ENV PYTHONUNBUFFERED=1
 ENV VIRTUAL_ENV=/home/django/venv
