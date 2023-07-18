@@ -7,14 +7,22 @@ Getting started with DjangoProject
 -------------------------
 
 + DEV
-  1. pip install -r requirements.txt
-  2. python manage.py runserver 0:8000
+  1. git clone git@github.com:daibeisi/studydjango.git
+  2. git关闭跟踪文件修改提交 git update-index --assume-unchanged "DjangoProject.conf"
+  3. 修改 DjangoProject.conf 配置文件中配置
+  4. pip install -r requirements.txt
+  5. python manage.py runserver 0:8000
+  6. python manage.py createsuperuser
 + PROD
   1. git clone git@github.com:daibeisi/studydjango.git
   2. 将ssl证书放到 nginx/cert 目录下
-  3. 修改 DjangoProject.conf 配置文件中配置
-  4. docker-compose up -d --build
-  5. 进入backend容器执行 python manage.py collectstatic && python manage.py createsuperuser
+  3. git关闭跟踪文件修改提交 git update-index --assume-unchanged "DjangoProject.conf"
+  4. 修改 DjangoProject.conf 配置文件中配置
+  5. docker-compose up -d --build
+  6. 进入backend容器执行 python manage.py collectstatic && python manage.py createsuperuser
+```
+NOTE: git打开跟踪文件修改提交 git update-index --no-assume-unchanged "DjangoProject.conf"
+```
 
 解决方案
 -------------------------
