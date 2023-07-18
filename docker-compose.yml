@@ -18,6 +18,7 @@ services:
       - Django_ENV=production
     volumes:
       - ./Apps/:/home/django/workspace/Apps/
+      - ./crontab/:/home/django/workspace/crontab/
       - ./daibeisi_tools/:/home/django/workspace/daibeisi_tools/
       - ./DjangoProject/:/home/django/workspace/DjangoProject/
       - ./file/:/home/django/workspace/file/
@@ -26,6 +27,7 @@ services:
       - ./static/:/home/django/workspace/static/
       - ./templates/:/home/django/workspace/templates/
       - ./DjangoProject.conf/:/home/django/workspace/DjangoProject.conf
+      - ./entrypoint.sh/:/home/django/workspace/entrypoint.sh
       - ./gunicorn.conf.py/:/home/django/workspace/gunicorn.conf.py
       - ./manage.py:/home/django/workspace/manage.py
       - ./requirements.txt:/home/django/workspace/requirements.txt
