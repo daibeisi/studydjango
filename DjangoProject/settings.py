@@ -114,19 +114,20 @@ if Django_ENV == "production":
     INSTALLED_APPS += [
         'gunicorn',  # 部署用
     ]
-    OSS_ACCESS_KEY_ID = cf.get(Django_ENV, 'OSS_ACCESS_KEY_ID'),
-    OSS_ACCESS_KEY_SECRET = cf.get(Django_ENV, 'OSS_ACCESS_KEY_SECRET'),
-    OSS_BUCKET_NAME = cf.get(Django_ENV, 'OSS_BUCKET_NAME'),
-    OSS_ENDPOINT = cf.get(Django_ENV, 'OSS_ENDPOINT'),
-    OSS_EXPIRE_TIME = cf.getint(Django_ENV, 'OSS_EXPIRE_TIME'),
-    STORAGES = {
-        "default": {
-            "BACKEND": "DjangoProject.django_oss_storage.OssStaticStorage"
-        },
-        "staticfiles": {
-            "BACKEND": "DjangoProject.django_oss_storage.OssMediaStorage"
-        },
-    }
+    # FIXME:修复获取的配置不是str而是tuple
+    # OSS_ACCESS_KEY_ID = cf.get(Django_ENV, 'OSS_ACCESS_KEY_ID'),
+    # OSS_ACCESS_KEY_SECRET = cf.get(Django_ENV, 'OSS_ACCESS_KEY_SECRET'),
+    # OSS_BUCKET_NAME = cf.get(Django_ENV, 'OSS_BUCKET_NAME'),
+    # OSS_ENDPOINT = cf.get(Django_ENV, 'OSS_ENDPOINT'),
+    # OSS_EXPIRE_TIME = cf.getint(Django_ENV, 'OSS_EXPIRE_TIME'),
+    # STORAGES = {
+    #     "default": {
+    #         "BACKEND": "DjangoProject.django_oss_storage.OssStaticStorage"
+    #     },
+    #     "staticfiles": {
+    #         "BACKEND": "DjangoProject.django_oss_storage.OssMediaStorage"
+    #     },
+    # }
     sentry_sdk.init(
         dsn=cf.get(Django_ENV, 'SENTRY_DSN'),
         environment=cf.get(Django_ENV, 'SENTRY_ENVIRONMENT'),
