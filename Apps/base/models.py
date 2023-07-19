@@ -1,14 +1,18 @@
 from django.db import models
 from django.contrib.auth.models import User
 from concurrency.fields import IntegerVersionField
+from django.db.models import OuterRef, Subquery
 import uuid
 
 
 class BaseModel(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid1, editable=False)
+    # id = models.UUIDField(primary_key=True, default=uuid.uuid1, editable=False)
     create_time = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
     edit_time = models.DateTimeField(verbose_name="修改时间", auto_now=True)
-    version = IntegerVersionField()
+    create_user = models.ForeignKey(verbose_name="创建者", to=User, on_delete=models.CASCADE)
+    edit_user = models.ForeignKey(verbose_name="编辑者", to=User, on_delete=models.CASCADE, blank=True, null=True)
+    is_delete = models.BooleanField(verbose_name="逻辑删除", default=False)
+    # version = IntegerVersionField()
 
     class Meta:
         # 告诉 Django 这是个抽象基类
@@ -18,6 +22,11 @@ class BaseModel(models.Model):
         # 在这里执行自定义逻辑
         super().save(*args, **kwargs)
 
+    def delete(self, using=None, keep_parents=False):
+        """重写数据库删除方法实现逻辑删除"""
+        self.is_delete = True
+        self.save()
+
 
 class GenderChoices(models.TextChoices):
     Female = "female", "女",
@@ -26,6 +35,8 @@ class GenderChoices(models.TextChoices):
 
 
 class UserInfo(models.Model):
+    uid = models.UUIDField(verbose_name="用户标识码", default=uuid.uuid1, editable=False, db_index=True, unique=True)
+    nickname = models.CharField(verbose_name="昵称", max_length=30, blank=True, null=True)
     user = models.OneToOneField(to=User, on_delete=models.CASCADE, verbose_name="用户")
     id_number = models.CharField(verbose_name="身份证号", max_length=30, blank=True, null=True, unique=True)
     openid = models.CharField(verbose_name="微信openid", max_length=30, blank=True, null=True, unique=True)
@@ -58,7 +69,7 @@ class Country(models.Model):
 
 class Province(models.Model):
     name = models.CharField(verbose_name="名称", max_length=30)
-    country = models.ForeignKey(verbose_name="省", to="Country", on_delete=models.CASCADE)
+    country = models.ForeignKey(verbose_name="国家", to="Country", on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name

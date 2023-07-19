@@ -9,6 +9,7 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         data['access'] = str(refresh.access_token)
 
         # Add extra responses here
-        data['username'] = self.user.username
+        data['nickname'] = self.user.userinfo.nickname
         data['groups'] = self.user.groups.values_list('name', flat=True)
+        data['permissions'] = []  # TODO:查询用户名下所有权限
         return data
