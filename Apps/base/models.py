@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from concurrency.fields import IntegerVersionField
 from django.db.models import OuterRef, Subquery
 import uuid
+import random
 
 
 class BaseModel(models.Model):
@@ -34,9 +35,20 @@ class GenderChoices(models.TextChoices):
     Other = "other", "其他"
 
 
+letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G',
+           'H', 'I', 'J', 'K', 'L', 'M', 'N',
+           'O', 'P', 'Q', 'R', 'S', 'T',
+           'U', 'V', 'W', 'X', 'Y', 'Z',
+           'a', 'b', 'c', 'd', 'e', 'f', 'g',
+           'h', 'i', 'j', 'k', 'l', 'm', 'n',
+           'o', 'p', 'q', 'r', 's', 't',
+           'u', 'v', 'w', 'x', 'y', 'z']
+numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0]
+
+
 class UserInfo(models.Model):
     uid = models.UUIDField(verbose_name="用户标识码", default=uuid.uuid1, editable=False, db_index=True, unique=True)
-    nickname = models.CharField(verbose_name="昵称", max_length=30, blank=True, null=True)
+    nickname = models.CharField(verbose_name="昵称", max_length=30, blank=True)
     user = models.OneToOneField(to=User, on_delete=models.CASCADE, verbose_name="用户")
     id_number = models.CharField(verbose_name="身份证号", max_length=30, blank=True, null=True, unique=True)
     openid = models.CharField(verbose_name="微信openid", max_length=30, blank=True, null=True, unique=True)
@@ -46,6 +58,12 @@ class UserInfo(models.Model):
     birthday = models.DateField(verbose_name="出生日期", blank=True, null=True)
     telephone = models.CharField(verbose_name="座机电话", max_length=15, blank=True, null=True)
     mobile_phone = models.CharField(verbose_name="手机号码", max_length=15, blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+        if not self.nickname:
+            self.nickname = f"用户_{random.choice(letters)}{random.choice(letters)}{random.choice(numbers)}" \
+                            f"{random.choice(numbers)}{random.choice(letters)}{random.choice(numbers)}"
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.user.username}的用户信息"
