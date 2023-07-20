@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+# from Apps.dep.models import Department
 from concurrency.fields import IntegerVersionField
 from django.db.models import OuterRef, Subquery
 import uuid
@@ -13,6 +14,7 @@ class BaseModel(models.Model):
     create_user = models.ForeignKey(verbose_name="创建者", to=User, on_delete=models.CASCADE)
     edit_user = models.ForeignKey(verbose_name="编辑者", to=User, on_delete=models.CASCADE, blank=True, null=True)
     is_delete = models.BooleanField(verbose_name="逻辑删除", default=False)
+
     # version = IntegerVersionField()
 
     class Meta:
@@ -58,6 +60,8 @@ class UserInfo(models.Model):
     birthday = models.DateField(verbose_name="出生日期", blank=True, null=True)
     telephone = models.CharField(verbose_name="座机电话", max_length=15, blank=True, null=True)
     mobile_phone = models.CharField(verbose_name="手机号码", max_length=15, blank=True, null=True)
+    dep = models.ForeignKey(verbose_name="所属部门", to="dep.Department", blank=True, null=True,
+                            on_delete=models.CASCADE)
 
     def save(self, *args, **kwargs):
         if not self.nickname:
@@ -66,7 +70,7 @@ class UserInfo(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.user.username}的用户信息"
+        return self.nickname
 
     class Meta:
         verbose_name = "用户信息"

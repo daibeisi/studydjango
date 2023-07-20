@@ -8,6 +8,7 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         # Add extra responses here
         # FIXME：修复管理站点创建用户时不创建对应userinfo，导致登陆时报错
         data['nickname'] = self.user.userinfo.nickname
+        data['dep_name'] = self.user.userinfo.dep.name
         data['groups'] = self.user.groups.values_list('name', flat=True)
         data['permissions'] = self.user.get_all_permissions()
         return data
