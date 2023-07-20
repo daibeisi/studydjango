@@ -47,4 +47,5 @@ urlpatterns = [
     path('api-auth/api-router/', include(router.urls)),
     path('favicon.ico', RedirectView.as_view(url='/static/favicon.ico')),
     path("admin/", admin.site.urls),
+    path("", RedirectView.as_view(url='/admin/login')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
