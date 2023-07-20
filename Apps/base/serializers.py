@@ -6,9 +6,8 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         data = super().validate(attrs)
 
         # Add extra responses here
-        # FIXME：修复管理站点创建用户时不创建对应userinfo，导致登陆时报错
-        data['nickname'] = self.user.userinfo.nickname
-        data['dep_name'] = self.user.userinfo.dep.name
+        data['nickname'] = self.user.userinfo.nickname if self.user.userinfo else ""
+        data['dep_name'] = self.user.userinfo.dep.name if self.user.userinfo.dep else "" if self.user.userinfo else ""
         data['groups'] = self.user.groups.values_list('name', flat=True)
         data['permissions'] = self.user.get_all_permissions()
         return data
