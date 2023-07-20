@@ -140,8 +140,9 @@ cython_debug/
 .idea
 .vscode
 
-migrations/
 !migrations/__init__.py
+migrations/
+
 nginx/cert/
 file/
 whoosh_index/
