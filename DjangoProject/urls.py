@@ -19,7 +19,7 @@ from django.urls import path, include
 from django.views.generic.base import RedirectView
 from django.conf import settings
 from django.conf.urls.static import static
-from DjangoProject.rest_framework import router
+
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
@@ -28,6 +28,8 @@ from rest_framework_simplejwt.views import (
     TokenBlacklistView,
     TokenVerifyView
 )
+from rest_framework.routers import DefaultRouter
+router = DefaultRouter()
 
 
 # Django 自带后台管理系统名称修改
