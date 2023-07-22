@@ -1,3 +1,5 @@
+import json
+import time
 from django.shortcuts import render, HttpResponseRedirect
 from django.contrib.auth import authenticate, login
 from django.db import transaction
@@ -12,13 +14,27 @@ from rest_framework.decorators import api_view
 from rest_framework import status
 from rest_framework.reverse import reverse
 from rest_framework import generics
-
-import json
-import time
+from rest_framework import permissions
 
 from DjangoProject.tools import mp
-from .models import UserInfo, Country, Province, City, Area, Town
-from .serializers import CountrySerializer, ProvinceSerializer, CitySerializer, AreaSerializer, TownSerializer
+from .models import (
+    UserInfo,
+    Department,
+    Router,
+    Country,
+    Province,
+    City,
+    Area,
+    Town
+)
+from .serializers import (
+    DepartmentSerializer,
+    CountrySerializer,
+    ProvinceSerializer,
+    CitySerializer,
+    AreaSerializer,
+    TownSerializer
+)
 
 
 class RegisterView(APIView):
@@ -93,6 +109,18 @@ class WeixinLogin(APIView):
             })
 
 
+class DepartmentList(generics.ListCreateAPIView):
+    queryset = Department.objects.all().order_by('id')
+    serializer_class = DepartmentSerializer
+    permission_classes = (permissions.IsAuthenticated,)
+
+
+class DepartmentDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Department.objects.all()
+    serializer_class = DepartmentSerializer
+    permission_classes = (permissions.IsAuthenticated,)
+
+
 @api_view(['GET', 'POST'])
 def country_list(request):
     """
@@ -116,23 +144,23 @@ def country_detail(request, pk):
     """
     Retrieve，update or delete an article instance。"""
     try:
-        article = Country.objects.get(pk=pk)
+        record = Country.objects.get(pk=pk)
     except Country.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
     if request.method == 'GET':
-        serializer = CountrySerializer(article)
+        serializer = CountrySerializer(record)
         return Response(serializer.data)
 
     elif request.method == 'PUT':
-        serializer = CountrySerializer(article, data=request.data)
+        serializer = CountrySerializer(record, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     elif request.method == 'DELETE':
-        article.delete()
+        record.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 

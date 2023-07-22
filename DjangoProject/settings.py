@@ -43,7 +43,6 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt.token_blacklist',
     # 自定义应用
     "Apps.base",
-    "Apps.dep",
 ]
 
 # 设置认证系统中使用的用户模型, 例如这里指定为使用base应用程序中User模型
