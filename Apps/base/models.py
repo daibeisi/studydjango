@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 # from Apps.dep.models import Department
 from concurrency.fields import IntegerVersionField
 from django.db.models import OuterRef, Subquery
@@ -76,6 +76,26 @@ class UserInfo(models.Model):
         verbose_name = "用户信息"
         verbose_name_plural = "用户信息表"
         ordering = ['id']
+
+
+class Router(models.Model):
+    name = models.CharField(verbose_name="名称", max_length=30, unique=True)
+    content = models.JSONField(verbose_name="内容")
+    groups = models.ManyToManyField(Group, verbose_name="组", blank=True)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = "路由"
+        verbose_name_plural = "路由列表"
+
+
+# class ExtendedGroup(Group):
+#     routers = models.ManyToManyField(Router, verbose_name="路由", blank=True)
+#
+#     class Meta:
+#         proxy = True
 
 
 class Country(models.Model):

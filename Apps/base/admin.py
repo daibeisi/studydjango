@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import UserInfo, Country, Province, City, Area, Town
+from .models import UserInfo, Router, Country, Province, City, Area, Town
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User, Permission
 
@@ -17,6 +17,11 @@ class NewUserAdmin(UserAdmin):
 
 admin.site.unregister(User)
 admin.site.register(User, NewUserAdmin)
+
+
+@admin.register(Router)
+class RouterAdmin(admin.ModelAdmin):
+    filter_horizontal = ("groups",)
 
 
 @admin.register(Permission)
