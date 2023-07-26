@@ -202,3 +202,30 @@ class TownList(generics.ListCreateAPIView):
 class TownDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Town.objects.all()
     serializer_class = TownSerializer
+
+
+def router_list_to_tree(router_objs):
+    router_dict = {}
+    for router_obj in router_objs:
+        router_obj.content.update({"id": router_obj.id, "parent_id": router_obj.parent_id})
+        router_dict.setdefault(router_obj.id, router_obj.content).update(router_obj.content)
+        router_dict.setdefault(router_obj.parent_id, {}).setdefault("children", []).append(
+            router_dict.get(router_obj.id, router_obj.content)
+        )
+    router_tree = []
+    for router in router_dict.values():
+        if not router.get("parent_id", True):
+            router_tree.append(router)
+
+    return router_tree
+
+
+@api_view(['GET'])
+def router_list(request):
+    """
+    List all countries, or create a new country.
+    """
+    if request.method == 'GET':
+        records = Router.objects.all()
+        router_tree = router_list_to_tree(records)
+        return Response(router_tree)
