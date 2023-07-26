@@ -19,7 +19,7 @@ Getting started with DjangoProject
   3. git关闭跟踪文件修改提交 git update-index --assume-unchanged "DjangoProject.conf"
   4. 修改 DjangoProject.conf 配置文件中配置
   5. docker-compose up -d --build
-  6. 进入backend容器执行 python manage.py collectstatic && python manage.py createsuperuser
+  6. 进入backend容器执行 python manage.py collectstatic && python manage.py createcachetable && python manage.py createsuperuser
 ```
 NOTE: git打开跟踪文件修改提交 git update-index --no-assume-unchanged "DjangoProject.conf"
 ```

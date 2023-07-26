@@ -6,6 +6,7 @@ app_name = 'Apps.base'
 
 
 urlpatterns = [
+    path('routers/', views.router_list, name='router-list'),
     path('countries/', views.country_list, name='country-list'),
     path('countries/<int:pk>/', views.country_detail, name='country-detail'),
     path('provinces/', views.ProvinceList.as_view(), name='province-list'),
