@@ -140,11 +140,9 @@ cython_debug/
 .idea
 .vscode
 
-!migrations/__init__.py
-migrations/
-
 nginx/cert/
+nginx/log/
 file/
 whoosh_index/
-django_project_log/
+logs/
 data/
