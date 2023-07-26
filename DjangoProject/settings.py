@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",  # 消息框架
     "django.contrib.staticfiles",  # 管理静态文件的框架
     # 第三方应用
+    "guardian",
     "ckeditor",
     "ckeditor_uploader",
     "haystack",
@@ -47,6 +48,10 @@ INSTALLED_APPS = [
 
 # 设置认证系统中使用的用户模型, 例如这里指定为使用base应用程序中User模型
 # AUTH_USER_MODEL = "Apps.base.User"
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',  # this is default
+    'guardian.backends.ObjectPermissionBackend',
+)
 
 # 中间件，响应前自动处理
 MIDDLEWARE = [

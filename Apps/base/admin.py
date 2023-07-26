@@ -1,6 +1,9 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User, Permission
+from guardian.models import GroupObjectPermission, UserObjectPermission
+from guardian.admin import GuardedModelAdmin
+
 
 from .models import (
     UserInfo,
@@ -40,6 +43,16 @@ class RouterAdmin(admin.ModelAdmin):
 
 @admin.register(Permission)
 class PermissionAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(UserObjectPermission)
+class UserObjectPermissionAdmin(GuardedModelAdmin):
+    pass
+
+
+@admin.register(GroupObjectPermission)
+class GroupObjectPermissionAdmin(GuardedModelAdmin):
     pass
 
 
