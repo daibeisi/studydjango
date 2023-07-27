@@ -2,18 +2,22 @@ from django.db import models
 from django.contrib.auth.models import User, Group, Permission
 from concurrency.fields import IntegerVersionField
 from django.db.models import OuterRef, Subquery
+from django.conf import settings
+from guardian.shortcuts import assign_perm
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 import uuid
 import random
 
 
 class BaseModel(models.Model):
-    # id = models.UUIDField(primary_key=True, default=uuid.uuid1, editable=False)
+    create_user = models.ForeignKey(verbose_name="创建者", to=User, on_delete=models.SET_NULL, null=True)
     create_time = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
+    edit_user = models.ForeignKey(verbose_name="编辑者", to=User, on_delete=models.SET_NULL, null=True)
     edit_time = models.DateTimeField(verbose_name="修改时间", auto_now=True)
-    create_user = models.ForeignKey(verbose_name="创建者", to=User, on_delete=models.CASCADE)
-    edit_user = models.ForeignKey(verbose_name="编辑者", to=User, on_delete=models.CASCADE, blank=True, null=True)
     is_delete = models.BooleanField(verbose_name="逻辑删除", default=False)
 
+    # id = models.UUIDField(primary_key=True, default=uuid.uuid1, editable=False)
     # version = IntegerVersionField()
 
     class Meta:
@@ -50,7 +54,7 @@ numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0]
 class UserInfo(models.Model):
     uid = models.UUIDField(verbose_name="用户标识码", default=uuid.uuid1, editable=False, db_index=True, unique=True)
     nickname = models.CharField(verbose_name="昵称", max_length=30, blank=True)
-    user = models.OneToOneField(to=User, on_delete=models.CASCADE, verbose_name="用户")
+    user = models.OneToOneField(verbose_name="用户", to=User, on_delete=models.CASCADE, null=True)
     id_number = models.CharField(verbose_name="身份证号", max_length=30, blank=True, null=True, unique=True)
     openid = models.CharField(verbose_name="微信openid", max_length=30, blank=True, null=True, unique=True)
     unionid = models.CharField(verbose_name="微信unionid", max_length=30, blank=True, null=True, unique=True)
@@ -59,8 +63,7 @@ class UserInfo(models.Model):
     birthday = models.DateField(verbose_name="出生日期", blank=True, null=True)
     telephone = models.CharField(verbose_name="座机电话", max_length=15, blank=True, null=True)
     mobile_phone = models.CharField(verbose_name="手机号码", max_length=15, blank=True, null=True)
-    dep = models.ForeignKey(verbose_name="所属部门", to="Department", blank=True, null=True,
-                            on_delete=models.CASCADE)
+    dep = models.ForeignKey(verbose_name="所属部门", to="Department", blank=True, null=True, on_delete=models.SET_NULL)
 
     def save(self, *args, **kwargs):
         if not self.nickname:
@@ -77,12 +80,21 @@ class UserInfo(models.Model):
         ordering = ['id']
 
 
+@receiver(post_save, sender=User, dispatch_uid= "unique_identifier")
+def user_post_save_handler(sender, **kwargs):
+    user, created = kwargs["instance"], kwargs["created"]
+    if created and user.username != settings.ANONYMOUS_USER_NAME:
+        UserInfo.objects.create(user=user)
+    else:
+        user.userinfo.save()
+
+
 class Department(models.Model):
     parent = models.ForeignKey(verbose_name="上级部门", to="Department", blank=True, null=True,
-                               on_delete=models.CASCADE)
+                               on_delete=models.SET_NULL)
     name = models.CharField(verbose_name="部门名称", max_length=30)
     manager = models.ForeignKey(verbose_name="部门负责人", to=UserInfo, blank=True, null=True,
-                                on_delete=models.CASCADE)
+                                on_delete=models.SET_NULL)
     telephone = models.CharField(verbose_name="座机电话", max_length=15, blank=True, null=True)
     mobile_phone = models.CharField(verbose_name="手机号码", max_length=15, blank=True, null=True)
     email = models.CharField(verbose_name="部门邮箱", max_length=30, blank=True, null=True)
@@ -101,7 +113,7 @@ class Department(models.Model):
 
 class Router(models.Model):
     parent = models.ForeignKey(verbose_name="上级路由", to="Router", blank=True, null=True,
-                               on_delete=models.CASCADE)
+                               on_delete=models.SET_NULL)
     name = models.CharField(verbose_name="名称", max_length=30, unique=True)
     content = models.JSONField(verbose_name="内容")
     groups = models.ManyToManyField(Group, verbose_name="组", blank=True)
@@ -128,7 +140,7 @@ class Country(models.Model):
 
 class Province(models.Model):
     name = models.CharField(verbose_name="名称", max_length=30)
-    country = models.ForeignKey(verbose_name="国家", to="Country", on_delete=models.CASCADE)
+    country = models.ForeignKey(verbose_name="国家", to="Country", on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
         return self.name
@@ -141,8 +153,8 @@ class Province(models.Model):
 
 class City(models.Model):
     name = models.CharField(verbose_name="名称", max_length=30)
-    country = models.ForeignKey(verbose_name="国家", to="Country", on_delete=models.CASCADE)
-    province = models.ForeignKey(verbose_name="省", to="Province", on_delete=models.CASCADE)
+    country = models.ForeignKey(verbose_name="国家", to="Country", on_delete=models.SET_NULL, null=True)
+    province = models.ForeignKey(verbose_name="省", to="Province", on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
         return self.name
@@ -155,9 +167,9 @@ class City(models.Model):
 
 class Area(models.Model):
     name = models.CharField(verbose_name="名称", max_length=50)
-    country = models.ForeignKey(verbose_name="国家", to="Country", on_delete=models.CASCADE)
-    province = models.ForeignKey(verbose_name="省", to="Province", on_delete=models.CASCADE)
-    city = models.ForeignKey(verbose_name="市", to="City", on_delete=models.CASCADE)
+    country = models.ForeignKey(verbose_name="国家", to="Country", on_delete=models.SET_NULL, null=True)
+    province = models.ForeignKey(verbose_name="省", to="Province", on_delete=models.SET_NULL, null=True)
+    city = models.ForeignKey(verbose_name="市", to="City", on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
         return self.name
@@ -170,10 +182,10 @@ class Area(models.Model):
 
 class Town(models.Model):
     name = models.CharField(verbose_name="名称", max_length=50)
-    country = models.ForeignKey(verbose_name="国家", to="Country", on_delete=models.CASCADE)
-    province = models.ForeignKey(verbose_name="省", to="Province", on_delete=models.CASCADE)
-    city = models.ForeignKey(verbose_name="市", to="City", on_delete=models.CASCADE)
-    area = models.ForeignKey(verbose_name="区/县", to="Area", on_delete=models.CASCADE)
+    country = models.ForeignKey(verbose_name="国家", to="Country", on_delete=models.SET_NULL, null=True)
+    province = models.ForeignKey(verbose_name="省", to="Province", on_delete=models.SET_NULL, null=True)
+    city = models.ForeignKey(verbose_name="市", to="City", on_delete=models.SET_NULL, null=True)
+    area = models.ForeignKey(verbose_name="区/县", to="Area", on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
         return self.name
