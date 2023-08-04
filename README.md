@@ -27,7 +27,7 @@ NOTE: git打开跟踪文件修改提交 git update-index --no-assume-unchanged "
 解决方案
 -------------------------
 # 导入导出
-  django-import-export-celery
+  django-import-export
 # restapi
   djangorestframework
 # token认证

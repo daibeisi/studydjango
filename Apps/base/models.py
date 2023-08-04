@@ -10,28 +10,41 @@ import uuid
 import random
 
 
-class BaseModel(models.Model):
+class ModelLogicalDeleteMixin(models.Model):
+    is_delete = models.BooleanField(verbose_name="逻辑删除", default=False)
+
+    class Meta:
+        # 告诉 Django 这是个抽象基类
+        abstract = True
+
+    def delete(self, using=None, keep_parents=False):
+        """重写数据库删除方法实现逻辑删除"""
+        self.is_delete = True
+        self.save()
+
+
+class ModelTraceInfoMixin(models.Model):
     create_user = models.ForeignKey(verbose_name="创建者", to=User, on_delete=models.SET_NULL, null=True)
     create_time = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
     edit_user = models.ForeignKey(verbose_name="编辑者", to=User, on_delete=models.SET_NULL, null=True)
     edit_time = models.DateTimeField(verbose_name="修改时间", auto_now=True)
-    is_delete = models.BooleanField(verbose_name="逻辑删除", default=False)
-
-    # id = models.UUIDField(primary_key=True, default=uuid.uuid1, editable=False)
-    # version = IntegerVersionField()
 
     class Meta:
         # 告诉 Django 这是个抽象基类
         abstract = True
 
     def save(self, *args, **kwargs):
-        # 在这里执行自定义逻辑
+        # FIXME：修复无法记录当前记录创建者和修改者
         super().save(*args, **kwargs)
 
-    def delete(self, using=None, keep_parents=False):
-        """重写数据库删除方法实现逻辑删除"""
-        self.is_delete = True
-        self.save()
+
+class BaseModel(ModelLogicalDeleteMixin, ModelTraceInfoMixin):
+    # id = models.UUIDField(primary_key=True, default=uuid.uuid1, editable=False)
+    # version = IntegerVersionField()
+
+    class Meta:
+        # 告诉 Django 这是个抽象基类
+        abstract = True
 
 
 class GenderChoices(models.TextChoices):
@@ -80,7 +93,7 @@ class UserInfo(models.Model):
         ordering = ['id']
 
 
-@receiver(post_save, sender=User, dispatch_uid= "unique_identifier")
+@receiver(post_save, sender=User, dispatch_uid="user_post_save_handler")
 def user_post_save_handler(sender, **kwargs):
     user, created = kwargs["instance"], kwargs["created"]
     if created and user.username != settings.ANONYMOUS_USER_NAME:

@@ -261,6 +261,7 @@ CACHES = {
         'LOCATION': 'django_cache',
     }
 }
+# TODO:使用redis存储缓存
 # CACHES = {
 #     # 默认存储信息: 存到 0 号库
 #     "default": {
@@ -272,6 +273,7 @@ CACHES = {
 #     }
 # }
 
+# TODO：配置Django日志记录规则
 # 日志设置
 # LOGGING = {
 #     "version": 1,
