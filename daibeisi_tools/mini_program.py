@@ -7,8 +7,7 @@ from functools import wraps
 
 
 class MiniProgram:
-    """小程序接口
-    """
+    """小程序接口"""
     _instance = None
     _lock = threading.RLock()
 
@@ -42,7 +41,7 @@ class MiniProgram:
                 self.access_token = res_json.get("access_token")
             else:
                 errmsg = res_json.get("errmsg")
-                raise RuntimeError(f"微信auth.getAccessToken接口获取access_token失败{errcode}{errmsg}")
+                raise RuntimeError(f"微信auth.getAccessToken接口{url}获取access_token失败{errcode}{errmsg}")
 
     def ensure_access_token_effective(func):
         @wraps(func)
@@ -58,7 +57,6 @@ class MiniProgram:
         """获取用户openid、session_key、unionid
 
         :param str js_code: 通过 wx.login 接口获得临时登录凭证 code
-        :param int num_tries: 重试次数,默认3次
         :return: id_info = {openid、session_key、unionid（绑定开放平台才有）}
         """
         url = 'https://api.weixin.qq.com/sns/jscode2session?appid={appid}&secret={secret}&js_code={js_code}&' \
@@ -75,7 +73,7 @@ class MiniProgram:
                 return user_id_info
             else:
                 errmsg = res_json.get("errmsg")
-                raise RuntimeError(f"微信auth.code2Session接口获取openid、session_key、unionid失败{errcode}{errmsg}")
+                raise RuntimeError(f"微信auth.code2Session接口{url}获取openid、session_key、unionid失败{errcode}{errmsg}")
 
     @ensure_access_token_effective
     def get_phone_info(self, code):
@@ -95,7 +93,7 @@ class MiniProgram:
                 return phone_info
             else:
                 errmsg = res_json.get("errmsg")
-                raise RuntimeError(f"微信phonenumber.getPhoneNumber接口获取phone_number失败{errcode}{errmsg}")
+                raise RuntimeError(f"微信phonenumber.getPhoneNumber接口{url}-{data}获取phone_number失败{errcode}{errmsg}")
 
 
 if __name__ == '__main__':

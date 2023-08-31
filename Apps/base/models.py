@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User, Group, Permission
 from concurrency.fields import IntegerVersionField
 from django.db.models import OuterRef, Subquery
+from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 from guardian.shortcuts import assign_perm
 from django.db.models.signals import post_save
@@ -24,10 +25,11 @@ class ModelLogicalDeleteMixin(models.Model):
 
 
 class ModelTraceInfoMixin(models.Model):
-    create_user = models.ForeignKey(verbose_name="创建者", to=User, on_delete=models.SET_NULL, null=True)
-    create_time = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
-    edit_user = models.ForeignKey(verbose_name="编辑者", to=User, on_delete=models.SET_NULL, null=True)
-    edit_time = models.DateTimeField(verbose_name="修改时间", auto_now=True)
+    # Translations: 模型记录日志的翻译
+    create_user = models.ForeignKey(verbose_name=_("创建者"), to=User, on_delete=models.SET_NULL, null=True)
+    create_time = models.DateTimeField(verbose_name=_("创建时间"), auto_now_add=True)
+    edit_user = models.ForeignKey(verbose_name=_("编辑者"), to=User, on_delete=models.SET_NULL, null=True)
+    edit_time = models.DateTimeField(verbose_name=_("修改时间"), auto_now=True)
 
     class Meta:
         # 告诉 Django 这是个抽象基类
@@ -65,9 +67,9 @@ numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0]
 
 
 class UserInfo(models.Model):
+    user = models.OneToOneField(verbose_name="用户", to=User, on_delete=models.CASCADE, null=True)
     uid = models.UUIDField(verbose_name="用户标识码", default=uuid.uuid1, editable=False, db_index=True, unique=True)
     nickname = models.CharField(verbose_name="昵称", max_length=30, blank=True)
-    user = models.OneToOneField(verbose_name="用户", to=User, on_delete=models.CASCADE, null=True)
     id_number = models.CharField(verbose_name="身份证号", max_length=30, blank=True, null=True, unique=True)
     openid = models.CharField(verbose_name="微信openid", max_length=30, blank=True, null=True, unique=True)
     unionid = models.CharField(verbose_name="微信unionid", max_length=30, blank=True, null=True, unique=True)
@@ -130,7 +132,7 @@ class Router(models.Model):
     name = models.CharField(verbose_name="名称", max_length=30, unique=True)
     content = models.JSONField(verbose_name="内容")
     groups = models.ManyToManyField(Group, verbose_name="组", blank=True)
-    permissions = models.ManyToManyField(Permission, verbose_name="权限", blank=True)
+    permissions = models.ManyToManyField(Permission, verbose_name="页面权限", blank=True)
 
     def __str__(self):
         return self.name
@@ -166,7 +168,6 @@ class Province(models.Model):
 
 class City(models.Model):
     name = models.CharField(verbose_name="名称", max_length=30)
-    country = models.ForeignKey(verbose_name="国家", to="Country", on_delete=models.SET_NULL, null=True)
     province = models.ForeignKey(verbose_name="省", to="Province", on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
@@ -175,13 +176,11 @@ class City(models.Model):
     class Meta:
         verbose_name = '市'
         verbose_name_plural = '市列表'
-        unique_together = ("country", "province", "name")
+        unique_together = ("province", "name")
 
 
 class Area(models.Model):
     name = models.CharField(verbose_name="名称", max_length=50)
-    country = models.ForeignKey(verbose_name="国家", to="Country", on_delete=models.SET_NULL, null=True)
-    province = models.ForeignKey(verbose_name="省", to="Province", on_delete=models.SET_NULL, null=True)
     city = models.ForeignKey(verbose_name="市", to="City", on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
@@ -190,14 +189,11 @@ class Area(models.Model):
     class Meta:
         verbose_name = '区/县'
         verbose_name_plural = '区/县列表'
-        unique_together = ("country", "province", "city", "name")
+        unique_together = ("city", "name")
 
 
 class Town(models.Model):
     name = models.CharField(verbose_name="名称", max_length=50)
-    country = models.ForeignKey(verbose_name="国家", to="Country", on_delete=models.SET_NULL, null=True)
-    province = models.ForeignKey(verbose_name="省", to="Province", on_delete=models.SET_NULL, null=True)
-    city = models.ForeignKey(verbose_name="市", to="City", on_delete=models.SET_NULL, null=True)
     area = models.ForeignKey(verbose_name="区/县", to="Area", on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
@@ -206,4 +202,4 @@ class Town(models.Model):
     class Meta:
         verbose_name = '乡/镇/街道'
         verbose_name_plural = '乡/镇/街道列表'
-        unique_together = ("country", "province", "city", "area", "name")
+        unique_together = ("area", "name")

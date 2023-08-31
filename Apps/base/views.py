@@ -46,10 +46,11 @@ class RegisterView(APIView):
         password = request.POST.get("password")
         if not username or not password:
             return Response({"code": -1, "message": "用户名或密码为空！"})
-        if User.objects.filter(username=username).exists():
-            return Response({"code": -1, "message": "用户已存在！"})
-        User.objects.create(username=username, password=make_password(password))
-        return Response({"code": 0, "message": "用户创建成功！", "data": {"username": username, "password": password}})
+        with transaction.atomic():
+            if User.objects.filter(username=username).exists():
+                return Response({"code": -1, "message": "用户已存在！"})
+            User.objects.create(username=username, password=make_password(password))
+            return Response({"code": 0, "message": "用户创建成功！"})
 
 
 class LoginView(APIView):
@@ -82,9 +83,9 @@ class LogoutView(APIView):
 
 class WeixinLogin(APIView):
     def post(self, request, format=None):
-        js_code = json.loads(request.body).get('js_code')
+        js_code = request.POST.get("js_code")
         user_id_info = mp.get_user_id_info(js_code)
-        openid = user_id_info.get("openid")
+        openid = user_id_info.get("openid", "")
         unionid = user_id_info.get("unionid")
         with transaction.atomic():
             if openid:
@@ -222,9 +223,6 @@ def router_list_to_tree(router_objs):
 
 @api_view(['GET'])
 def router_list(request):
-    """
-    List all countries, or create a new country.
-    """
     if request.method == 'GET':
         records = Router.objects.all()
         router_tree = router_list_to_tree(records)

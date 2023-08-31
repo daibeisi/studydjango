@@ -44,6 +44,10 @@ NOTE: git打开跟踪文件修改提交 git update-index --no-assume-unchanged "
   sentry
 # 静态文件压缩
   django-compressor
+# 样式
+  django-bootstrap4
+# 注册
+  django-register
 + 接口安全
   1. 请求身份是否合法？
   2. 请求参数是否篡改？

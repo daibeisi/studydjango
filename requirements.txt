@@ -1,5 +1,6 @@
-Django==4.2.3
+Django==4.2.4
 requests
+hiredis
 djangorestframework
 markdown
 django-filter
@@ -14,7 +15,6 @@ pillow
 whoosh
 django-haystack
 jieba
-django-concurrency
 django-simpleui
 django-import-export
 gevent
@@ -23,3 +23,5 @@ oss2
 wechatpayv3
 django-compressor
 sentry-sdk[django]
+django-celery-results
+django-celery-beat

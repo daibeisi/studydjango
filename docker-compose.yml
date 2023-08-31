@@ -11,14 +11,26 @@ services:
       - POSTGRES_DB=django
       - POSTGRES_USER=django
       - POSTGRES_PASSWORD=django
+  redis:
+    build:
+      context: .
+      dockerfile: Dockerfile-redis
+    restart: always
+    volumes:
+      - ./redis/redis.conf:/etc/redis/redis.conf
+      - ./redis/data:/data
+    environment:
+      - TZ=Asia/Shanghai
   backend:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile-backend
     restart: always
     environment:
-      - Django_ENV=production
+      - DJANGO_SETTINGS_MODULE=DjangoProject.settings.production
     volumes:
       - ./Apps/:/home/django/workspace/Apps/
-      - ./crontab/:/home/django/workspace/crontab/
+      - ./celery_tasks/:/home/django/workspace/celery_tasks/
       - ./daibeisi_tools/:/home/django/workspace/daibeisi_tools/
       - ./DjangoProject/:/home/django/workspace/DjangoProject/
       - ./file/:/home/django/workspace/file/
@@ -26,13 +38,12 @@ services:
       - ./middlewares/:/home/django/workspace/middlewares/
       - ./static/:/home/django/workspace/static/
       - ./templates/:/home/django/workspace/templates/
-      - ./DjangoProject.conf/:/home/django/workspace/DjangoProject.conf
-      - ./entrypoint.sh/:/home/django/workspace/entrypoint.sh
       - ./gunicorn.conf.py/:/home/django/workspace/gunicorn.conf.py
       - ./manage.py:/home/django/workspace/manage.py
       - ./requirements.txt:/home/django/workspace/requirements.txt
     depends_on:
       - db
+      - redis
   nginx:
     image: nginx
     restart: always

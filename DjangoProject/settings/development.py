@@ -8,19 +8,19 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
+
+Note:因为设置文件包含敏感信息，应该尽一切努力限制对它的访问。例如，更改其文件权限，以便只有您和您的 Web 服务器的用户可以读取它。
 """
-# TODO:因为设置文件包含敏感信息，应该尽一切努力限制对它的访问。例如，更改其文件权限，以便只有您和您的 Web 服务器的用户可以读取它。
 import os
+from datetime import timedelta
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
-from .config import cf
-from .simpleui import *
-from .ckeditor import *
-from .haystack import HAYSTACK_CONNECTIONS, HAYSTACK_SIGNAL_PROCESSOR, HAYSTACK_SEARCH_RESULTS_PER_PAGE
-from .simplejwt import SIMPLE_JWT
+from DjangoProject.simpleui import *
+from DjangoProject.ckeditor import *
+from DjangoProject.haystack import HAYSTACK_CONNECTIONS, HAYSTACK_SIGNAL_PROCESSOR, HAYSTACK_SEARCH_RESULTS_PER_PAGE
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
 
@@ -42,6 +42,8 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework_simplejwt",
     'rest_framework_simplejwt.token_blacklist',
+    "django_celery_results",
+    "django_celery_beat",
     # 自定义应用
     "Apps.base",
 ]
@@ -57,6 +59,7 @@ ANONYMOUS_USER_NAME = "AnonymousUser"
 
 # 中间件，响应前自动处理
 MIDDLEWARE = [
+    # 'middlewares.test_middleware.TestMiddleware',  # 自定义中间件
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -64,8 +67,6 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    # 自定义中间件
-    'middlewares.test_middleware.TestMiddleware'
 ]
 
 # 指项目文件下同名文件夹下的urls，项目改名字这里也要改
@@ -93,95 +94,59 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "DjangoProject.wsgi.application"
-Django_ENV = os.environ.get('Django_ENV', "development")
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
-if Django_ENV == "production":
-    # SECURITY WARNING: don't run with debug turned on in production!
-    DEBUG = False
-    # SECURITY WARNING: keep the secret key used in production secret!
-    SECRET_KEY = cf.get(Django_ENV, 'Django_SECRET_KEY')
-    # 该配置避免你的站点遭受某些 CSRF 攻击。如果使用了通配符，你必须实现自定义的 Host HTTP 头，或者确保你不会很容易地遭受此种攻击。
-    ALLOWED_HOSTS = [".bookhub.com.cn"]
-    # Database
-    # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-    DATABASES = {
-        "default": {
-            "ENGINE": 'django.db.backends.postgresql',
-            "NAME": cf.get(Django_ENV, 'Django_DB_NAME'),
-            "USER": cf.get(Django_ENV, 'Django_DB_USER'),
-            "PASSWORD": cf.get(Django_ENV, 'Django_DB_PASSWORD'),
-            "HOST": cf.get(Django_ENV, 'Django_DB_HOST'),
-            "PORT": cf.getint(Django_ENV, 'Django_DB_PORT'),
-            "CONN_MAX_AGE": 10,  # 持久化连接时间
-        }
+
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = True
+
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = "django-insecure-zc1django-insecure-8i*l$lti7$7&&!37p3sx9c2)34qmtsa*ib(w+1iholg8ctq$"
+
+# 该配置避免你的站点遭受某些 CSRF 攻击。如果使用了通配符，你必须实现自定义的 Host HTTP 头，或者确保你不会很容易地遭受此种攻击。
+ALLOWED_HOSTS = ["*"]
+
+# Database
+# https://docs.djangoproject.com/en/4.2/ref/settings/#databases
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
     }
-    INSTALLED_APPS += [
-        'gunicorn',  # 部署用
-    ]
-    # FIXME:修复获取的配置不是str而是tuple
-    # OSS_ACCESS_KEY_ID = cf.get(Django_ENV, 'OSS_ACCESS_KEY_ID'),
-    # OSS_ACCESS_KEY_SECRET = cf.get(Django_ENV, 'OSS_ACCESS_KEY_SECRET'),
-    # OSS_BUCKET_NAME = cf.get(Django_ENV, 'OSS_BUCKET_NAME'),
-    # OSS_ENDPOINT = cf.get(Django_ENV, 'OSS_ENDPOINT'),
-    # OSS_EXPIRE_TIME = cf.getint(Django_ENV, 'OSS_EXPIRE_TIME'),
-    # STORAGES = {
-    #     "default": {
-    #         "BACKEND": "DjangoProject.django_oss_storage.OssStaticStorage"
-    #     },
-    #     "staticfiles": {
-    #         "BACKEND": "DjangoProject.django_oss_storage.OssMediaStorage"
-    #     },
-    # }
-    sentry_sdk.init(
-        dsn=cf.get(Django_ENV, 'SENTRY_DSN'),
-        environment=cf.get(Django_ENV, 'SENTRY_ENVIRONMENT'),
-        integrations=[
-            DjangoIntegration(
-                # 如何命名出现在 Sentry 性能监控中的事务。
-                transaction_style='url',
-                # 创建跨度并跟踪 Django 项目中所有中间件的性能。设置False为禁用。
-                middleware_spans=True,
-                # 在您的 Django 项目中创建跨度并跟踪所有Django 信号接收器函数的性能。设置False为禁用。
-                signals_spans=True,
-                # 创建跨度并跟踪对已配置缓存的所有读取操作的性能。跨度还包括缓存访问是命中还是未命中的信息。设置False为禁用。
-                cache_spans=True,
-            ),
-        ],
-        traces_sample_rate=1.0,
-        send_default_pii=True
-    )
-else:
-    # Quick-start development settings - unsuitable for production
-    # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
-    DEBUG = True
-    SECRET_KEY = cf.get(Django_ENV, 'Django_SECRET_KEY')
-    ALLOWED_HOSTS = ["*"]
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / "db.sqlite3",
-        }
+}
+
+# 缓存设置,执行创建表命令python manage.py createcachetable
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.db.DatabaseCache",
+        "LOCATION": "django_cache_table",
     }
-    sentry_sdk.init(
-        dsn=cf.get(Django_ENV, 'SENTRY_DSN'),
-        environment=cf.get(Django_ENV, 'SENTRY_ENVIRONMENT'),
-        integrations=[
-            DjangoIntegration(
-                # 如何命名出现在 Sentry 性能监控中的事务。
-                transaction_style='url',
-                # 创建跨度并跟踪 Django 项目中所有中间件的性能。设置False为禁用。
-                middleware_spans=True,
-                # 在您的 Django 项目中创建跨度并跟踪所有Django 信号接收器函数的性能。设置False为禁用。
-                signals_spans=True,
-                # 创建跨度并跟踪对已配置缓存的所有读取操作的性能。跨度还包括缓存访问是命中还是未命中的信息。设置False为禁用。
-                cache_spans=True,
-            ),
-        ],
-        traces_sample_rate=1.0,
-        send_default_pii=True
-    )
+}
+
+# celery相关配置
+CELERY_BROKER_URL = 'redis://redis:6379/6'
+CELERY_RESULT_BACKEND = 'django-db'
+
+# sentry相关配置
+sentry_sdk.init(
+    dsn="https://1095ff1dac414862b53e6460ac78f9e9@o4503963655667712.ingest.sentry.io/4505242286358528",
+    environment="development",
+    integrations=[
+        DjangoIntegration(
+            # 如何命名出现在 Sentry 性能监控中的事务。
+            transaction_style='url',
+            # 创建跨度并跟踪 Django 项目中所有中间件的性能。设置False为禁用。
+            middleware_spans=True,
+            # 在您的 Django 项目中创建跨度并跟踪所有Django 信号接收器函数的性能。设置False为禁用。
+            signals_spans=True,
+            # 创建跨度并跟踪对已配置缓存的所有读取操作的性能。跨度还包括缓存访问是命中还是未命中的信息。设置False为禁用。
+            cache_spans=True,
+        ),
+    ],
+    traces_sample_rate=1.0,
+    send_default_pii=True
+)
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -229,6 +194,52 @@ REST_FRAMEWORK = {
     },
 }
 
+# simple jwt 相关配置
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=10),  # 访问令牌有效时间
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),  # 刷新令牌有效时间
+    "ROTATE_REFRESH_TOKENS": True,  # 若为True，刷新时refresh_token也会刷新
+    "BLACKLIST_AFTER_ROTATION": True,  # 若为True，刷新后的token将添加到黑名单中
+    "UPDATE_LAST_LOGIN": False,  # 是否更新auth_user 表中的 last_login 字段
+    "ALGORITHM": "HS256",  # 加密算法
+    "SIGNING_KEY": SECRET_KEY,  # 签名密钥
+    "VERIFYING_KEY": "",  # 验证密钥，加密算法指定HMAC时被忽略
+    "AUDIENCE": None,  # 生成的令牌中和/或在解码的令牌中验证的受众主张。当设置为 "无 "时，该字段被排除在令牌之外，并且不被验证。
+    "ISSUER": None,  # 生成的令牌中和/或在解码的令牌中验证的发行者主张。当设置为 "无 "时，该字段被排除在令牌之外，并且不被验证。
+    "JSON_ENCODER": None,
+    "JWK_URL": None,  # JWK_URL用于动态解析验证令牌签名所需的公钥
+    "LEEWAY": timedelta(seconds=60),  # 令牌过期回旋时间
+    "AUTH_HEADER_TYPES": ("Bearer",),  # 需要认证的视图所接受的授权头类型
+    "AUTH_HEADER_NAME": "HTTP_AUTHORIZATION",  # 用于认证的授权标头名称
+    "USER_ID_FIELD": "id",  # 指定识别用户的字段
+    "USER_ID_CLAIM": "user_id",  # 存储用户标识符
+
+    # 确定用户是否被允许进行认证规则
+    "USER_AUTHENTICATION_RULE": "rest_framework_simplejwt.authentication.default_user_authentication_rule",
+
+    "AUTH_TOKEN_CLASSES": (
+        "rest_framework_simplejwt.tokens.AccessToken",
+        # "rest_framework_simplejwt.tokens.SlidingToken"
+    ),  # 允许用来证明认证的令牌类型
+    "TOKEN_TYPE_CLAIM": "token_type",  # 存储令牌类型的名称
+
+    # 一个无状态的用户对象，由一个经过验证的令牌支持。仅用于JWTStatelessUserAuthentication认证后端。
+    "TOKEN_USER_CLASS": "rest_framework_simplejwt.models.TokenUser",
+
+    "JTI_CLAIM": "jti",  # 存储一个令牌的唯一标识符的声称名称
+
+    "SLIDING_TOKEN_REFRESH_EXP_CLAIM": "refresh_exp",  # 存储滑动令牌刷新期的过期时间的名称
+    "SLIDING_TOKEN_LIFETIME": timedelta(minutes=5),  # 滑动令牌的有效时间
+    "SLIDING_TOKEN_REFRESH_LIFETIME": timedelta(days=1),  # 指定了可以刷新滑动令牌的有效时间
+
+    "TOKEN_OBTAIN_SERIALIZER": "Apps.base.serializers.MyTokenObtainPairSerializer",
+    "TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSerializer",
+    "TOKEN_VERIFY_SERIALIZER": "rest_framework_simplejwt.serializers.TokenVerifySerializer",
+    "TOKEN_BLACKLIST_SERIALIZER": "rest_framework_simplejwt.serializers.TokenBlacklistSerializer",
+    "SLIDING_TOKEN_OBTAIN_SERIALIZER": "rest_framework_simplejwt.serializers.TokenObtainSlidingSerializer",
+    "SLIDING_TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSlidingSerializer",
+}
+
 # session设置
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # 引擎（默认）
 SESSION_COOKIE_NAME = "sessionid"  # Session的cookie保存在浏览器上时的key，即：sessionid＝随机字符串（默认）
@@ -254,47 +265,19 @@ CSRF_FAILURE_VIEW = 'django.views.csrf.csrf_failure'  # 当传入的请求被 CS
 CSRF_HEADER_NAME = 'HTTP_X_CSRFTOKEN'  # 用于 CSRF 认证的请求头的名称。
 CSRF_TRUSTED_ORIGINS = ["https://test.bookhub.com.cn"]  # 不安全请求的可信来源列表
 
-# 缓存设置,执行创建表命令python manage.py createcachetable
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
-        'LOCATION': 'django_cache',
-    }
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+        },
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": "DEBUG",
+    },
 }
-# TODO:使用redis存储缓存
-# CACHES = {
-#     # 默认存储信息: 存到 0 号库
-#     "default": {
-#         "BACKEND": "django_redis.cache.RedisCache",
-#         "LOCATION": "redis://192.168.0.100:6379/0",
-#         "OPTIONS": {
-#             "CLIENT_CLASS": "django_redis.client.DefaultClient",
-#         }
-#     }
-# }
-
-# TODO：配置Django日志记录规则
-# 日志设置
-# LOGGING = {
-#     "version": 1,
-#     "disable_existing_loggers": False,
-#     "handlers": {
-#         "console": {
-#             "class": "logging.StreamHandler",
-#         },
-#     },
-#     "root": {
-#         "handlers": ["console"],
-#         "level": "WARNING",
-#     },
-#     "loggers": {
-#         "django": {
-#             "handlers": ["console"],
-#             "level": os.getenv("DJANGO_LOG_LEVEL", "INFO"),
-#             "propagate": False,
-#         },
-#     },
-# }
 
 # 默认电子邮件地址，用于网站管理员的各种自动通信。这不包括发送到ADMINS和MANAGERS的错误信息
 DEFAULT_FROM_EMAIL = 'heyares@163.com'
@@ -303,23 +286,30 @@ ADMINS = [
     ("daibeisi", "heyares@163.com"),
 ]
 
+MP_APPID = ""
+MP_SECRET = ""
+
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
+from django.utils.translation import gettext_lazy as _
+
+
+LANGUAGES = [
+    ['zh-hans', _('Chinese')],
+    ['en', _('English')]
+]
 LANGUAGE_CODE = "zh-hans"  # 语言格式
-
 TIME_ZONE = "Asia/Shanghai"  # 设置时区
-
 USE_I18N = True  # 是否使用国际化 (i18n) 功能
-# LOCALE_PATHS = [os.path.join(BASE_DIR, 'locale')]  # 设置以指定 Django 应在何处查找翻译文件
-
-USE_L10N = False  # 用于决定是否开启数据本地化。如果此设置为True，例如Django将使用当前语言环境的格式显示数字和日期。
-
-USE_TZ = False  # 指定是否使用指定的时区(TIME_ZONE)的时间
+LOCALE_PATHS = [os.path.join(BASE_DIR, 'locale')]  # 设置以指定 Django 应在何处查找翻译文件
+USE_L10N = True  # 用于决定是否开启数据本地化。如果此设置为True，例如Django将使用当前语言环境的格式显示数字和日期。
+USE_TZ = True  # 指定是否使用指定的时区(TIME_ZONE)的时间
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 # 静态文件设置,执行创建表命令python manage.py collectstatic
+
 STATIC_ROOT = os.path.join(BASE_DIR, "file/static")
 STATIC_URL = "/static/"
 STATICFILES_DIRS = [

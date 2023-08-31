@@ -140,6 +140,7 @@ cython_debug/
 .idea
 .vscode
 
+DjangoProject/settings/production.py
 nginx/cert/
 nginx/log/
 file/
