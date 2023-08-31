@@ -42,4 +42,4 @@ WORKDIR /home/django/workspace
 COPY . .
 
 #USER django
-CMD ["gunicorn", "-c", "gunicorn.conf.py"]
+CMD ["gunicorn", "-c", "gunicorn.conf.py", "--preload"]
