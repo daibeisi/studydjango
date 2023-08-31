@@ -12,15 +12,14 @@ services:
       - POSTGRES_USER=django
       - POSTGRES_PASSWORD=django
   redis:
-    build:
-      context: .
-      dockerfile: Dockerfile-redis
     restart: always
     volumes:
       - ./redis/redis.conf:/etc/redis/redis.conf
       - ./redis/data:/data
     environment:
       - TZ=Asia/Shanghai
+    command: redis-server /etc/redis/redis.conf
+    privileged: true
   backend:
     build:
       context: .
