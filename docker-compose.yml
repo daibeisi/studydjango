@@ -12,6 +12,7 @@ services:
       - POSTGRES_USER=django
       - POSTGRES_PASSWORD=django
   redis:
+    image: redis
     restart: always
     volumes:
       - ./redis/redis.conf:/etc/redis/redis.conf
