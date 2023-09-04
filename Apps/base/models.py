@@ -90,9 +90,18 @@ class UserInfo(models.Model):
         return self.nickname
 
     class Meta:
-        verbose_name = "用户信息"
-        verbose_name_plural = "用户信息表"
+        verbose_name = "人员"
+        verbose_name_plural = "人员列表"
         ordering = ['id']
+
+
+@receiver(post_save, sender=UserInfo, dispatch_uid="userinfo_post_save_handler")
+def user_post_save_handler(sender, **kwargs):
+    userinfo, created = kwargs["instance"], kwargs["created"]
+    if created:
+        User.objects.create(userinfo=userinfo)
+    else:
+        userinfo.user.save()
 
 
 @receiver(post_save, sender=User, dispatch_uid="user_post_save_handler")
@@ -102,6 +111,23 @@ def user_post_save_handler(sender, **kwargs):
         UserInfo.objects.create(user=user)
     else:
         user.userinfo.save()
+
+
+class Company(models.Model):
+    name = models.CharField(verbose_name="名称", max_length=30)
+    unicode = models.CharField(verbose_name="统一社会信用代码", max_length=30, blank=True, null=True)
+    telephone = models.CharField(verbose_name="座机电话", max_length=15, blank=True, null=True)
+    mobile_phone = models.CharField(verbose_name="手机号码", max_length=15, blank=True, null=True)
+    email = models.CharField(verbose_name="邮箱", max_length=30, blank=True, null=True)
+    remark = models.CharField(verbose_name="备注", max_length=300, blank=True, null=True)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = '公司'
+        verbose_name_plural = '公司列表'
+        unique_together = ("name",)
 
 
 class Department(models.Model):

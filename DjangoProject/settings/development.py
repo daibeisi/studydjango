@@ -42,8 +42,8 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework_simplejwt",
     'rest_framework_simplejwt.token_blacklist',
-    "django_celery_results",
-    "django_celery_beat",
+    # "django_celery_results",
+    # "django_celery_beat",
     # 自定义应用
     "Apps.base",
 ]

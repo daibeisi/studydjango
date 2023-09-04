@@ -7,6 +7,7 @@ from guardian.admin import GuardedModelAdmin
 
 from .models import (
     UserInfo,
+    Company,
     Department,
     Router,
     Country,
@@ -29,6 +30,16 @@ class NewUserAdmin(UserAdmin):
 
 admin.site.unregister(User)
 admin.site.register(User, NewUserAdmin)
+
+
+@admin.register(UserInfo)
+class UserInfoAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(Company)
+class CompanyAdmin(admin.ModelAdmin):
+    pass
 
 
 @admin.register(Department)
