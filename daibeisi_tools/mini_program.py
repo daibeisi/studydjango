@@ -2,28 +2,18 @@
 import json
 import datetime
 import requests
-import threading
 from functools import wraps
+from daibeisi_tools.utils import SingletonMeta
 
 
-class MiniProgram:
+class MiniProgram(SingletonMeta):
     """小程序接口"""
-    _instance = None
-    _lock = threading.RLock()
 
     def __init__(self, appid: str, secret: str) -> None:
         self.appid = appid
         self.secret = secret
         self.access_token = None
         self.access_token_expires_time = datetime.datetime.now()
-
-    def __new__(cls, *args, **kwargs):
-        if cls._instance:
-            return cls._instance
-        with cls._lock:
-            if not cls._instance:
-                cls._instance = super().__new__(cls)
-            return cls._instance
 
     def _get_access_token(self):
         url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid={appid}&secret=" \
@@ -95,8 +85,29 @@ class MiniProgram:
                 errmsg = res_json.get("errmsg")
                 raise RuntimeError(f"微信phonenumber.getPhoneNumber接口{url}-{data}获取phone_number失败{errcode}{errmsg}")
 
+    @ensure_access_token_effective
+    def generate_scheme(self):
+        url = "https://api.weixin.qq.com/wxa/generatescheme" \
+              "?access_token={0}".format(self.access_token)
+        headers = {'Content-Type': 'application/json', "Accept": "application/json"}
+        try:
+            res = requests.post(url=url, headers=headers, timeout=5)
+        except Exception as exc:
+            raise RuntimeError("微信获取scheme码接口网络连接错误") from exc
+        else:
+            res_json = res.json()
+            errcode = res_json.get("errcode", 0)
+            if errcode == 0:
+                openlink = res_json.get("openlink")
+                return openlink
+            else:
+                errmsg = res_json.get("errmsg")
+                raise RuntimeError(f"获取scheme码接口{url}失败{errcode}{errmsg}")
+
 
 if __name__ == '__main__':
     mp = MiniProgram("", "")
-    user_id_info = mp.get_user_id_info("")
-    phone_info = mp.get_phone_info("")
+    # user_id_info = mp.get_user_id_info("")
+    # phone_info = mp.get_phone_info("")
+    # scheme = mp.generate_scheme()
+    # print(mp.generate_scheme())

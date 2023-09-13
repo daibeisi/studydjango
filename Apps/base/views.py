@@ -15,8 +15,6 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 from rest_framework import generics
 from rest_framework import permissions
-
-from DjangoProject.tools import mp
 from .models import (
     UserInfo,
     Department,
@@ -35,6 +33,9 @@ from .serializers import (
     AreaSerializer,
     TownSerializer
 )
+from django.conf import settings
+from daibeisi_tools.mini_program import MiniProgram
+mp = MiniProgram(appid=settings.MP_APPID, secret=settings.MP_SECRET)
 
 
 class RegisterView(APIView):
