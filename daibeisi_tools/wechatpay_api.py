@@ -1,10 +1,7 @@
-import threading
 from wechatpayv3 import WeChatPay, WeChatPayType
 
 
-class WechatPay:
-    _instance = None
-    _lock = threading.RLock()
+class WechatPayAPI:
 
     def __init__(self, mchid, private_key, cert_serial_no, apiv3_key, appid, notify_url, cert_dir):
         self._wechatpay_type = WeChatPayType.MINIPROG,
@@ -25,11 +22,3 @@ class WechatPay:
             notify_url=self._notify_url,
             cert_dir=self._cert_dir
         )
-
-    def __new__(cls, *args, **kwargs):
-        if cls._instance:
-            return cls._instance
-        with cls._lock:
-            if not cls._instance:
-                cls._instance = super().__new__(cls)
-            return cls._instance

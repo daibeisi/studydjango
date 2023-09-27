@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User, Group, Permission
-from concurrency.fields import IntegerVersionField
+# from concurrency.fields import IntegerVersionField
 from django.db.models import OuterRef, Subquery
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
@@ -96,7 +96,7 @@ class UserInfo(models.Model):
 
 
 @receiver(post_save, sender=UserInfo, dispatch_uid="userinfo_post_save_handler")
-def user_post_save_handler(sender, **kwargs):
+def userinfo_post_save_handler(sender, **kwargs):
     userinfo, created = kwargs["instance"], kwargs["created"]
     if created:
         User.objects.create(userinfo=userinfo)
