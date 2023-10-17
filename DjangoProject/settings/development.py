@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework_simplejwt",
     'rest_framework_simplejwt.token_blacklist',
+    "debug_toolbar",
     # "django_celery_results",
     # "django_celery_beat",
     # 自定义应用
@@ -60,6 +61,7 @@ ANONYMOUS_USER_NAME = "AnonymousUser"
 # 中间件，响应前自动处理
 MIDDLEWARE = [
     # 'middlewares.test_middleware.TestMiddleware',  # 自定义中间件
+    "debug_toolbar.middleware.DebugToolbarMiddleware",  # 调试工具栏中间件
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -70,7 +72,14 @@ MIDDLEWARE = [
 ]
 
 # 指项目文件下同名文件夹下的urls，项目改名字这里也要改
-ROOT_URLCONF = "DjangoProject.urls"
+ROOT_URLCONF = "DjangoProject.urls.development"
+
+# 调试工具栏显示IP
+INTERNAL_IPS = [
+    # ...
+    "127.0.0.1",
+    # ...
+]
 
 # 指定模板路径 BASE_DIR是项目根路径，有别的模板也要加进来
 TEMPLATES = [

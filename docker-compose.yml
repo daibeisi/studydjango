@@ -21,6 +21,22 @@ services:
       - TZ=Asia/Shanghai
     command: redis-server /etc/redis/redis.conf
     privileged: true
+  celery:
+    build:
+      context: .
+      dockerfile: Dockerfile-backend
+    command: Celery -A 项目名 worker -l info & celery -A untitled beat -l info  启动celery和定时任务
+    depends_on:
+      - redis
+  flower:
+    build:
+      context: .
+      dockerfile: Dockerfile-backend
+    ports:
+      - "5555:5555"
+    command:  启动异步任务监控
+    depends_on:
+      - redis
   backend:
     build:
       context: .

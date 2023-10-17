@@ -24,6 +24,22 @@ Getting started with DjangoProject
 NOTE: git打开跟踪文件修改提交 git update-index --no-assume-unchanged "DjangoProject.conf"
 ```
 
+Django的常用插件
+-------------------------
+1. Django debug toolbar：开发环境使用，提供一个可以查看debug信息的面板（包括SQL执行时间，页面耗时）
+2. django-silk：性能瓶颈分析
+3. Simple UI：给予 Element UI 和 VUE 的 Django admin 主题
+4. Haystack Django：模块化搜索方案
+5. Django notifications：发送消息通知
+6. Django markdown editor：Markdown 编辑器
+7. django-crispy-forms：Crispy 表单，以一种非常优雅、干净的方式来创建美观的表单
+8. django-simple-captcha：Django 表单验证码
+9. redis：缓存，以及celery的broker要用到的数据库
+10. celery：异步任务worker（用于异步发送钉钉消息通知）
+11. flower：异步任务的监控应用（监控异步任务的执行情况）
+12. sentry
+
+
 解决方案
 -------------------------
 # 导入导出
