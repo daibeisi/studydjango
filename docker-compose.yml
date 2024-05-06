@@ -5,7 +5,7 @@ services:
     image: postgres
     restart: always
     volumes:
-      - ./postgresql/data:/var/lib/postgresql/data
+      - ./db/data:/var/lib/postgresql/data
     environment:
       - TZ=Asia/Shanghai
       - POSTGRES_DB=django
