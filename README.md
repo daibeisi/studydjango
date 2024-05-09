@@ -37,7 +37,9 @@ Django的常用插件
 9. redis：缓存，以及celery的broker要用到的数据库
 10. celery：异步任务worker（用于异步发送钉钉消息通知）
 11. flower：异步任务的监控应用（监控异步任务的执行情况）
-12. sentry
+12. sentry：应用性能监控和错误追踪
+13. django-guardian：行级权限控制
+14. 
 
 
 解决方案

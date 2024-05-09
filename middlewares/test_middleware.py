@@ -21,3 +21,5 @@ class TestMiddleware(MiddlewareMixin):
     def process_template_response(self, request, response):
         logger.info("测试中间件的process_template_response()运行, 请求URL是：{}".format(request.path_info))
         return response
+
+

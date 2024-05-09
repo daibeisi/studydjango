@@ -6,7 +6,7 @@ from django.db import transaction
 from django.conf.global_settings import LOGIN_URL
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import make_password, check_password
-
+from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -35,7 +35,31 @@ from .serializers import (
 )
 from django.conf import settings
 from daibeisi_tools.mini_program import MiniProgramAPI
+
 mp = MiniProgramAPI(appid=settings.MP_APPID, secret=settings.MP_SECRET)
+
+from django.shortcuts import render
+from django.views.decorators.csrf import requires_csrf_token
+
+
+@requires_csrf_token
+def bad_request(request, exception):
+    return render(request, '400.html')
+
+
+@requires_csrf_token
+def permission_denied(request, exception):
+    return render(request, '403.html')
+
+
+@requires_csrf_token
+def page_not_found(request, exception):
+    return render(request, '404.html')
+
+
+@requires_csrf_token
+def error(request):
+    return render(request, '500.html')
 
 
 class RegisterView(APIView):
@@ -102,13 +126,13 @@ class WeixinLogin(APIView):
                 user.userinfo.save()
         refresh = RefreshToken.for_user(user)
         return Response({
-                "code": 0,
-                "msg": "登陆成功",
-                "data": {
-                    'refresh_token': str(refresh),
-                    'access_token': str(refresh.access_token)
-                }
-            })
+            "code": 0,
+            "msg": "登陆成功",
+            "data": {
+                'refresh_token': str(refresh),
+                'access_token': str(refresh.access_token)
+            }
+        })
 
 
 class DepartmentList(generics.ListCreateAPIView):
@@ -145,10 +169,12 @@ def country_list(request):
 def country_detail(request, pk):
     """
     Retrieve，update or delete an article instance。"""
-    try:
-        record = Country.objects.get(pk=pk)
-    except Country.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
+    # try:
+    #     record = Country.objects.get(pk=pk)
+    # except Country.DoesNotExist:
+    #     return Response(status=status.HTTP_404_NOT_FOUND)
+
+    record = get_object_or_404(Country, pk=pk)
 
     if request.method == 'GET':
         serializer = CountrySerializer(record)
