@@ -39,7 +39,6 @@ Django的常用插件
 11. flower：异步任务的监控应用（监控异步任务的执行情况）
 12. sentry：应用性能监控和错误追踪
 13. django-guardian：行级权限控制
-14. 
 
 
 解决方案
@@ -66,6 +65,25 @@ Django的常用插件
   django-bootstrap4
 # 注册
   django-register
+# 缓存
+  django-redis
+# 异步任务
+  celery
+# 邮件
+  django-mail-templated
+# 消息中间件
+  使用如 RabbitMQ、Kafka 或 Redis Pub/Sub 作为消息队列，用于异步处理和解耦合服务。
+# 数据库
+  mysql、postgresql、分布式数据库
+# 负载均衡
+  + 硬件负载均衡器：如 F5 或者 NGINX。
+  + 软件负载均衡：如 HAProxy 或者使用 Kubernetes 的服务发现和负载均衡功能。
+# 监控
+  如 Prometheus、Grafana，用于监控系统健康和性能。
+# 日志收集
+  如 ELK Stack (Elasticsearch, Logstash, Kibana)，用于收集和分析日志。
+# 容器化和编排
+  docker、 docker-compose、kubernetes
 + 接口安全
   1. 请求身份是否合法？
   2. 请求参数是否篡改？

@@ -45,33 +45,23 @@ services:
     environment:
       - DJANGO_SETTINGS_MODULE=DjangoProject.settings.production
     volumes:
-      - ./Apps/:/home/django/workspace/Apps/
-      - ./celery_tasks/:/home/django/workspace/celery_tasks/
-      - ./daibeisi_tools/:/home/django/workspace/daibeisi_tools/
-      - ./DjangoProject/:/home/django/workspace/DjangoProject/
       - ./file/:/home/django/workspace/file/
       - ./logs/:/home/django/workspace/logs/
-      - ./middlewares/:/home/django/workspace/middlewares/
-      - ./static/:/home/django/workspace/static/
-      - ./templates/:/home/django/workspace/templates/
-      - ./gunicorn.conf.py/:/home/django/workspace/gunicorn.conf.py
-      - ./manage.py:/home/django/workspace/manage.py
-      - ./requirements.txt:/home/django/workspace/requirements.txt
     depends_on:
       - db
       - redis
-  nginx:
-    image: nginx
-    restart: always
-    ports:
-      - "80:80"
-      - "443:443"
-    environment:
-      - TZ=Asia/Shanghai
-    volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
-      - ./nginx/cert:/etc/nginx/cert
-      - ./file:/usr/share/nginx/file
-      - ./nginx/log:/var/log/nginx
-    depends_on:
-      - backend
+#  nginx:
+#    image: nginx
+#    restart: always
+#    ports:
+#      - "80:80"
+#      - "443:443"
+#    environment:
+#      - TZ=Asia/Shanghai
+#    volumes:
+#      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+#      - ./nginx/cert:/etc/nginx/cert
+#      - ./file:/usr/share/nginx/file
+#      - ./nginx/log:/var/log/nginx
+#    depends_on:
+#      - backend

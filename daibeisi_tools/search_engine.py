@@ -2,14 +2,16 @@
 
 """
 
+
 class SearchEngineBase:
     """搜索引擎基础类"""
+
     def __init__(self):
         pass
 
     def add_corpus(self, file_path):
         """负责读取文件内容，将文件路径作为 ID，连同内容一起送到 process_corpus 中。"""
-        with open(file_path, 'r', encoding=str) as fin:
+        with open(file_path, ['r'], encoding=str) as fin:
             text = fin.read()
         self.process_corpus(file_path, text)
 
@@ -24,6 +26,7 @@ class SearchEngineBase:
 
 class SimpleEngine(SearchEngineBase):
     """简单搜索引擎"""
+
     def __init__(self):
         super(SimpleEngine, self).__init__()
         self.__id_to_texts = {}

@@ -54,7 +54,7 @@ from whoosh.highlight import highlight as whoosh_highlight
 from whoosh.qparser import FuzzyTermPlugin, QueryParser
 from whoosh.searching import ResultsPage
 from whoosh.sorting import Count, DateRangeFacet, FieldFacet
-from whoosh.support.relativedelta import relativedelta as RelativeDelta
+from whoosh.support.relativedelta import relativedelta
 from whoosh.writing import AsyncWriter
 
 DATETIME_REGEX = re.compile(
@@ -244,7 +244,7 @@ class WhooshSearchBackend(BaseSearchBackend):
                 "No fields were found in any search_indexes. Please correct this before attempting to search."
             )
 
-        return (content_field_name, Schema(**schema_fields))
+        return content_field_name, Schema(**schema_fields)
 
     def update(self, index, iterable, commit=True):
         if not self.setup_complete:
@@ -477,7 +477,7 @@ class WhooshSearchBackend(BaseSearchBackend):
                 end = _fixup_datetime(value["end_date"])
                 gap_by = value["gap_by"]
                 gap_amount = value.get("gap_amount", 1)
-                gap = RelativeDelta(**{"%ss" % gap_by: gap_amount})
+                gap = relativedelta(**{"%ss" % gap_by: gap_amount})
                 group_by.append(DateRangeFacet(key, start, end, gap, maptype=Count))
                 facet_types[key] = "dates"
 

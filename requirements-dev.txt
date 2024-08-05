@@ -1,3 +1,4 @@
+-r requirements/production.txt
 Django==4.2.4
 requests
 hiredis

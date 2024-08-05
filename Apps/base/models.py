@@ -1,52 +1,114 @@
-from django.db import models
-from django.contrib.auth.models import User, Group, Permission
-# from concurrency.fields import IntegerVersionField
-from django.db.models import OuterRef, Subquery
-from django.utils.translation import gettext_lazy as _
-from django.conf import settings
-from guardian.shortcuts import assign_perm
-from django.db.models.signals import post_save
-from django.dispatch import receiver
-import uuid
 import random
+import uuid
+
+from django.conf import settings
+from django.contrib.auth.models import User, Group, Permission
+from django.db import models
+from django.db.models.signals import post_save
+from django.db.utils import IntegrityError
+from django.dispatch import receiver
+from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 
 
 class ModelLogicalDeleteMixin(models.Model):
-    is_delete = models.BooleanField(verbose_name="逻辑删除", default=False)
+    """
+    An abstract base class model that provides a logical deletion field and methods.
+    """
+    is_deleted = models.BooleanField(_("Deleted"), default=False)
+    deleted_at = models.DateTimeField(_("Deleted at"), null=True, blank=True)
+    deleted_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name=_("Deleted by"),
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='deleted_%(class)ss'
+    )
 
     class Meta:
-        # 告诉 Django 这是个抽象基类
+        # Tell Django that it's an abstract base class
         abstract = True
 
-    def delete(self, using=None, keep_parents=False):
-        """重写数据库删除方法实现逻辑删除"""
-        self.is_delete = True
-        self.save()
+    def delete(self, using=None, keep_parents=False, user=None):
+        """
+        Override the database delete method to implement soft deletion.
+        """
+        self.is_deleted = True
+        self.deleted_at = timezone.now()
+        if user:
+            self.deleted_by = user
+        try:
+            self.save()
+        except IntegrityError as e:
+            # Handle potential integrity errors (e.g., foreign key constraints)
+            raise Exception("Failed to perform soft deletion due to an integrity error.") from e
+
+    def hard_delete(self, using=None, keep_parents=False):
+        """
+        Perform a hard delete of the object.
+        """
+        super().delete(using=using, keep_parents=keep_parents)
 
 
-class ModelTraceInfoMixin(models.Model):
-    # Translations: 模型记录日志的翻译
-    create_user = models.ForeignKey(verbose_name=_("创建者"), to=User, on_delete=models.SET_NULL, null=True)
-    create_time = models.DateTimeField(verbose_name=_("创建时间"), auto_now_add=True)
-    edit_user = models.ForeignKey(verbose_name=_("编辑者"), to=User, on_delete=models.SET_NULL, null=True)
-    edit_time = models.DateTimeField(verbose_name=_("修改时间"), auto_now=True)
+class ModelOptimisticLockMixin(models.Model):
+    """
+    A mixin that provides optimistic locking for Django models.
+    """
+    version = models.IntegerField(verbose_name=_("Version"), default=1)
 
     class Meta:
-        # 告诉 Django 这是个抽象基类
+        # Tell Django that it's an abstract base class
         abstract = True
 
     def save(self, *args, **kwargs):
-        # FIXME：修复无法记录当前记录创建者和修改者
-        super().save(*args, **kwargs)
+        if self.pk:
+            # Retrieve the current version of the object from the database
+            original = self.__class__.objects.get(pk=self.pk)
+            if original.version != self.version:
+                raise Exception("This record has been modified by another process.")
+            else:
+                super().save(*args, **kwargs)
+                self.version += 1
+        else:
+            super().save(*args, **kwargs)
 
 
-class BaseModel(ModelLogicalDeleteMixin, ModelTraceInfoMixin):
-    # id = models.UUIDField(primary_key=True, default=uuid.uuid1, editable=False)
-    # version = IntegerVersionField()
+class ModelTraceInfoMixin(models.Model):
+    """
+    An abstract base class model that provides fields for tracking creation and modification information.
+    """
+    create_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name=_("Creator"),
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='created_%(class)ss'
+    )
+    create_at = models.DateTimeField(_("Created at"), auto_now_add=True)
+    update_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name=_("Editor"),
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='edited_%(class)ss'
+    )
+    update_at = models.DateTimeField(_("Last edited at"), auto_now=True)
 
     class Meta:
-        # 告诉 Django 这是个抽象基类
+        # Tell Django that it's an abstract base class
         abstract = True
+
+    def save(self, user=None, force_insert=False, force_update=False, using=None, update_fields=None):
+        if not self.pk:  # If the object is being created
+            if user:
+                self.create_user = user
+                self.edit_user = user
+        else:  # If the object is being updated
+            if user:
+                self.edit_user = user
+        super().save(force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields)
 
 
 class GenderChoices(models.TextChoices):
@@ -95,25 +157,22 @@ class UserInfo(models.Model):
         ordering = ['id']
 
 
-@receiver(post_save, sender=UserInfo, dispatch_uid="userinfo_post_save_handler")
-def userinfo_post_save_handler(sender, **kwargs):
-    userinfo, created = kwargs["instance"], kwargs["created"]
-    if created:
-        User.objects.create(userinfo=userinfo)
-    else:
-        userinfo.user.save()
-
-
+# 文件夹不为空，无法删除
 @receiver(post_save, sender=User, dispatch_uid="user_post_save_handler")
 def user_post_save_handler(sender, **kwargs):
     user, created = kwargs["instance"], kwargs["created"]
     if created and user.username != settings.ANONYMOUS_USER_NAME:
         UserInfo.objects.create(user=user)
     else:
-        user.userinfo.save()
+        try:
+            user.userinfo.id
+            if user.userinfo.has_changed():
+                user.userinfo.save()
+        except UserInfo.DoesNotExist:
+            UserInfo.objects.create(user=user)
 
 
-class Company(models.Model):
+class Company(models.Model, ModelTraceInfoMixin, ModelOptimisticLockMixin, ModelLogicalDeleteMixin):
     name = models.CharField(verbose_name="名称", max_length=30)
     unicode = models.CharField(verbose_name="统一社会信用代码", max_length=30, blank=True, null=True)
     telephone = models.CharField(verbose_name="座机电话", max_length=15, blank=True, null=True)
@@ -130,7 +189,7 @@ class Company(models.Model):
         unique_together = ("name",)
 
 
-class Department(models.Model):
+class Department(models.Model, ModelTraceInfoMixin, ModelOptimisticLockMixin, ModelLogicalDeleteMixin):
     parent = models.ForeignKey(verbose_name="上级部门", to="Department", blank=True, null=True,
                                on_delete=models.SET_NULL)
     name = models.CharField(verbose_name="部门名称", max_length=30)

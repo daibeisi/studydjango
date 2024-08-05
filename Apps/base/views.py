@@ -1,20 +1,24 @@
-import json
 import time
-from django.shortcuts import render, HttpResponseRedirect
-from django.contrib.auth import authenticate, login
-from django.db import transaction
+
+from django.conf import settings
 from django.conf.global_settings import LOGIN_URL
-from django.contrib.auth.models import User
+from django.contrib.auth import authenticate
 from django.contrib.auth.hashers import make_password, check_password
+from django.contrib.auth.models import User
+from django.db import transaction
+from django.shortcuts import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework.decorators import api_view
-from rest_framework import status
-from rest_framework.reverse import reverse
+from django.shortcuts import render
+from django.views.decorators.csrf import requires_csrf_token
 from rest_framework import generics
 from rest_framework import permissions
+from rest_framework import status
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework_simplejwt.tokens import RefreshToken
+
+from daibeisi_tools.mini_program import MiniProgramAPI
 from .models import (
     UserInfo,
     Department,
@@ -33,13 +37,8 @@ from .serializers import (
     AreaSerializer,
     TownSerializer
 )
-from django.conf import settings
-from daibeisi_tools.mini_program import MiniProgramAPI
 
 mp = MiniProgramAPI(appid=settings.MP_APPID, secret=settings.MP_SECRET)
-
-from django.shortcuts import render
-from django.views.decorators.csrf import requires_csrf_token
 
 
 @requires_csrf_token
