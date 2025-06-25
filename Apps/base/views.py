@@ -22,20 +22,10 @@ from daibeisi_tools.mini_program import MiniProgramAPI
 from .models import (
     UserInfo,
     Department,
-    Router,
-    Country,
-    Province,
-    City,
-    Area,
-    Town
+    Router
 )
 from .serializers import (
-    DepartmentSerializer,
-    CountrySerializer,
-    ProvinceSerializer,
-    CitySerializer,
-    AreaSerializer,
-    TownSerializer
+    DepartmentSerializer
 )
 
 mp = MiniProgramAPI(appid=settings.MP_APPID, secret=settings.MP_SECRET)
@@ -144,91 +134,6 @@ class DepartmentDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Department.objects.all()
     serializer_class = DepartmentSerializer
     permission_classes = (permissions.IsAuthenticated,)
-
-
-@api_view(['GET', 'POST'])
-def country_list(request):
-    """
-    List all countries, or create a new country.
-    """
-    if request.method == 'GET':
-        records = Country.objects.all()
-        serializer = CountrySerializer(records, many=True)
-        return Response(serializer.data)
-
-    elif request.method == 'POST':
-        serializer = CountrySerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-@api_view(['GET', 'PUT', 'DELETE'])
-def country_detail(request, pk):
-    """
-    Retrieve，update or delete an article instance。"""
-    # try:
-    #     record = Country.objects.get(pk=pk)
-    # except Country.DoesNotExist:
-    #     return Response(status=status.HTTP_404_NOT_FOUND)
-
-    record = get_object_or_404(Country, pk=pk)
-
-    if request.method == 'GET':
-        serializer = CountrySerializer(record)
-        return Response(serializer.data)
-
-    elif request.method == 'PUT':
-        serializer = CountrySerializer(record, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    elif request.method == 'DELETE':
-        record.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-class ProvinceList(generics.ListCreateAPIView):
-    queryset = Province.objects.all().order_by('id')
-    serializer_class = ProvinceSerializer
-
-
-class ProvinceDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Province.objects.all()
-    serializer_class = ProvinceSerializer
-
-
-class CityList(generics.ListCreateAPIView):
-    queryset = City.objects.all().order_by('id')
-    serializer_class = CitySerializer
-
-
-class CityDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = City.objects.all()
-    serializer_class = CitySerializer
-
-
-class AreaList(generics.ListCreateAPIView):
-    queryset = Area.objects.all().order_by('id')
-    serializer_class = AreaSerializer
-
-
-class AreaDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Area.objects.all()
-    serializer_class = AreaSerializer
-
-
-class TownList(generics.ListCreateAPIView):
-    queryset = Town.objects.all().order_by('id')
-    serializer_class = TownSerializer
-
-
-class TownDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Town.objects.all()
-    serializer_class = TownSerializer
 
 
 def router_list_to_tree(router_objs):

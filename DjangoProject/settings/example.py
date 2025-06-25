@@ -15,12 +15,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 INSTALLED_APPS = [
     "simpleui",
     # 默认应用，为了方便大多数项目，如果不需要某个或某些应用，你可以在运行 migrate 前毫无顾虑注释或者删除掉它们
-    "django.contrib.admin",  # 管理员站点
     "django.contrib.auth",  # 认证授权系统
     "django.contrib.contenttypes",  # 内容类型框架
-    "django.contrib.sessions",  # 会话框架
-    "django.contrib.messages",  # 消息框架
-    "django.contrib.staticfiles",  # 管理静态文件的框架
     # 第三方应用
     "guardian",
     "ckeditor",

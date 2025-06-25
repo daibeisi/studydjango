@@ -9,12 +9,7 @@ from .models import (
     UserInfo,
     Company,
     Department,
-    Router,
-    Country,
-    Province,
-    City,
-    Area,
-    Town
+    Router
 )
 
 
@@ -64,29 +59,4 @@ class UserObjectPermissionAdmin(GuardedModelAdmin):
 
 @admin.register(GroupObjectPermission)
 class GroupObjectPermissionAdmin(GuardedModelAdmin):
-    pass
-
-
-@admin.register(Country)
-class CountryAdmin(admin.ModelAdmin):
-    pass
-
-
-@admin.register(Province)
-class ProvinceAdmin(admin.ModelAdmin):
-    pass
-
-
-@admin.register(City)
-class CityAdmin(admin.ModelAdmin):
-    pass
-
-
-@admin.register(Area)
-class AreaAdmin(admin.ModelAdmin):
-    pass
-
-
-@admin.register(Town)
-class TownAdmin(admin.ModelAdmin):
     pass

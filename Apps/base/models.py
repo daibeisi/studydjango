@@ -117,33 +117,31 @@ class GenderChoices(models.TextChoices):
     Other = "other", "其他"
 
 
-letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G',
-           'H', 'I', 'J', 'K', 'L', 'M', 'N',
-           'O', 'P', 'Q', 'R', 'S', 'T',
-           'U', 'V', 'W', 'X', 'Y', 'Z',
-           'a', 'b', 'c', 'd', 'e', 'f', 'g',
-           'h', 'i', 'j', 'k', 'l', 'm', 'n',
-           'o', 'p', 'q', 'r', 's', 't',
-           'u', 'v', 'w', 'x', 'y', 'z']
-numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0]
-
-
-class UserInfo(models.Model):
+class UserInfo(ModelLogicalDeleteMixin, ModelTraceInfoMixin, ModelOptimisticLockMixin, models.Model):
     user = models.OneToOneField(verbose_name="用户", to=User, on_delete=models.CASCADE, null=True)
     uid = models.UUIDField(verbose_name="用户标识码", default=uuid.uuid1, editable=False, db_index=True, unique=True)
-    nickname = models.CharField(verbose_name="昵称", max_length=30, blank=True)
-    id_number = models.CharField(verbose_name="身份证号", max_length=30, blank=True, null=True, unique=True)
-    openid = models.CharField(verbose_name="微信openid", max_length=30, blank=True, null=True, unique=True)
-    unionid = models.CharField(verbose_name="微信unionid", max_length=30, blank=True, null=True, unique=True)
-    gender = models.CharField(verbose_name="性别", choices=GenderChoices.choices, max_length=10, blank=True, null=True)
-    avatar = models.ImageField(verbose_name="头像", upload_to='avatar', default='avatar/avatar.png', max_length=100)
+    nickname = models.CharField(verbose_name="昵称", max_length=64, blank=True)
+    id_number = models.CharField(verbose_name="身份证号", max_length=64, blank=True, null=True, unique=True)
+    openid = models.CharField(verbose_name="微信openid", max_length=64, blank=True, null=True, unique=True)
+    unionid = models.CharField(verbose_name="微信unionid", max_length=64, blank=True, null=True, unique=True)
+    gender = models.CharField(verbose_name="性别", choices=GenderChoices.choices, max_length=64, blank=True, null=True)
+    avatar = models.ImageField(verbose_name="头像", upload_to='avatar', default='avatar/avatar.png', max_length=255)
     birthday = models.DateField(verbose_name="出生日期", blank=True, null=True)
-    telephone = models.CharField(verbose_name="座机电话", max_length=15, blank=True, null=True)
-    mobile_phone = models.CharField(verbose_name="手机号码", max_length=15, blank=True, null=True)
+    telephone = models.CharField(verbose_name="座机电话", max_length=32, blank=True, null=True)
+    mobile_phone = models.CharField(verbose_name="手机号码", max_length=32, blank=True, null=True)
     dep = models.ForeignKey(verbose_name="所属部门", to="Department", blank=True, null=True, on_delete=models.SET_NULL)
 
     def save(self, *args, **kwargs):
         if not self.nickname:
+            letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G',
+                       'H', 'I', 'J', 'K', 'L', 'M', 'N',
+                       'O', 'P', 'Q', 'R', 'S', 'T',
+                       'U', 'V', 'W', 'X', 'Y', 'Z',
+                       'a', 'b', 'c', 'd', 'e', 'f', 'g',
+                       'h', 'i', 'j', 'k', 'l', 'm', 'n',
+                       'o', 'p', 'q', 'r', 's', 't',
+                       'u', 'v', 'w', 'x', 'y', 'z']
+            numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0]
             self.nickname = f"用户_{random.choice(letters)}{random.choice(letters)}{random.choice(numbers)}" \
                             f"{random.choice(numbers)}{random.choice(letters)}{random.choice(numbers)}"
         super().save(*args, **kwargs)
@@ -157,7 +155,6 @@ class UserInfo(models.Model):
         ordering = ['id']
 
 
-# 文件夹不为空，无法删除
 @receiver(post_save, sender=User, dispatch_uid="user_post_save_handler")
 def user_post_save_handler(sender, **kwargs):
     user, created = kwargs["instance"], kwargs["created"]
@@ -172,7 +169,7 @@ def user_post_save_handler(sender, **kwargs):
             UserInfo.objects.create(user=user)
 
 
-class Company(models.Model, ModelTraceInfoMixin, ModelOptimisticLockMixin, ModelLogicalDeleteMixin):
+class Company(ModelTraceInfoMixin, ModelOptimisticLockMixin, ModelLogicalDeleteMixin, models.Model):
     name = models.CharField(verbose_name="名称", max_length=30)
     unicode = models.CharField(verbose_name="统一社会信用代码", max_length=30, blank=True, null=True)
     telephone = models.CharField(verbose_name="座机电话", max_length=15, blank=True, null=True)
@@ -189,7 +186,7 @@ class Company(models.Model, ModelTraceInfoMixin, ModelOptimisticLockMixin, Model
         unique_together = ("name",)
 
 
-class Department(models.Model, ModelTraceInfoMixin, ModelOptimisticLockMixin, ModelLogicalDeleteMixin):
+class Department(ModelTraceInfoMixin, ModelOptimisticLockMixin, ModelLogicalDeleteMixin, models.Model):
     parent = models.ForeignKey(verbose_name="上级部门", to="Department", blank=True, null=True,
                                on_delete=models.SET_NULL)
     name = models.CharField(verbose_name="部门名称", max_length=30)
@@ -225,66 +222,3 @@ class Router(models.Model):
     class Meta:
         verbose_name = "路由"
         verbose_name_plural = "路由列表"
-
-
-class Country(models.Model):
-    name = models.CharField(verbose_name="名称", max_length=30, unique=True)
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        verbose_name = '国家'
-        verbose_name_plural = '国家列表'
-
-
-class Province(models.Model):
-    name = models.CharField(verbose_name="名称", max_length=30)
-    country = models.ForeignKey(verbose_name="国家", to="Country", on_delete=models.SET_NULL, null=True)
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        verbose_name = '省'
-        verbose_name_plural = '省列表'
-        unique_together = ("country", "name")
-
-
-class City(models.Model):
-    name = models.CharField(verbose_name="名称", max_length=30)
-    province = models.ForeignKey(verbose_name="省", to="Province", on_delete=models.SET_NULL, null=True)
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        verbose_name = '市'
-        verbose_name_plural = '市列表'
-        unique_together = ("province", "name")
-
-
-class Area(models.Model):
-    name = models.CharField(verbose_name="名称", max_length=50)
-    city = models.ForeignKey(verbose_name="市", to="City", on_delete=models.SET_NULL, null=True)
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        verbose_name = '区/县'
-        verbose_name_plural = '区/县列表'
-        unique_together = ("city", "name")
-
-
-class Town(models.Model):
-    name = models.CharField(verbose_name="名称", max_length=50)
-    area = models.ForeignKey(verbose_name="区/县", to="Area", on_delete=models.SET_NULL, null=True)
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        verbose_name = '乡/镇/街道'
-        verbose_name_plural = '乡/镇/街道列表'
-        unique_together = ("area", "name")

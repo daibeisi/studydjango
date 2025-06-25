@@ -284,7 +284,7 @@ CSRF_COOKIE_SECURE = False  # 是否为 CSRF cookie 使用安全 cookie
 CSRF_USE_SESSIONS = False  # 是否将 CSRF 标记存储在用户的会话中，而不是 cookie 中
 CSRF_FAILURE_VIEW = 'django.views.csrf.csrf_failure'  # 当传入的请求被 CSRF 保护 拒绝时，要使用的视图函数的点分隔路径
 CSRF_HEADER_NAME = 'HTTP_X_CSRFTOKEN'  # 用于 CSRF 认证的请求头的名称。
-CSRF_TRUSTED_ORIGINS = ["*.com"]  # 不安全请求的可信来源列表
+CSRF_TRUSTED_ORIGINS = []  # 不安全请求的可信来源列表
 
 # 日志设置
 LOGGING = {
